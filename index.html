@@ -1,541 +1,118 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quliga 2D Futbol</title>
-<style>
-  :root{
-    --bg:#101827; --panel:#172238; --panel2:#1e2b43; --text:#f4f7fb;
-    --muted:#9eb0c7; --accent:#35d07f; --accent2:#ffd34e; --danger:#ff6b6b;
-    --line:#30415f; --pitch:#2e9d55; --pitch2:#238447; --white:#fff;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at 20% 0%,#1b3155 0,#101827 42%,#0c1320 100%);color:var(--text);min-height:100vh}
-  button,input,select{font:inherit}
-  button{border:0;border-radius:12px;padding:12px 18px;background:var(--accent);color:#082315;font-weight:800;cursor:pointer;transition:.15s transform,.15s filter}
-  button:hover{filter:brightness(1.06);transform:translateY(-1px)}
-  button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
-  button.warn{background:var(--accent2);color:#332500}
-  button.danger{background:var(--danger);color:#2b0808}
-  .app{max-width:1180px;margin:0 auto;padding:24px}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
-  .brand{display:flex;align-items:center;gap:12px}
-  .ball{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#082315;font-size:22px;box-shadow:0 7px 25px rgba(53,208,127,.25)}
-  h1,h2,h3{margin:0 0 8px}
-  .sub{color:var(--muted);font-size:14px}
-  .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}
-  .panel{background:rgba(23,34,56,.93);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
-  .screen{display:none}.screen.active{display:block}
-  .hero{padding:28px}
-  .hero p{max-width:720px;color:#cad6e5;line-height:1.55}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .spacer{height:12px}
-  .team-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
-  .team-card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer}
-  .team-card:hover{border-color:#4d6b96}
-  .team-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(53,208,127,.15) inset}
-  .team-name{font-weight:800}.team-meta{font-size:12px;color:var(--muted);margin-top:4px}
-  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:1px}
-  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-  input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0f1727;color:var(--text);outline:none}
-  input:focus{border-color:var(--accent)}
-  .form-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
-  .table{width:100%;border-collapse:collapse;margin-top:10px}
-  .table th,.table td{padding:9px 8px;border-bottom:1px solid rgba(48,65,95,.55);font-size:13px}
-  .table th{text-align:left;color:#9eb0c7;font-weight:700}
-  .table td:not(:first-child),.table th:not(:first-child){text-align:center}
-  .tag{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#10233a;color:#b7c8dd;border:1px solid var(--line);font-size:12px}
-  .match-card{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;margin-top:10px}
-  .match-card .vs{font-weight:900;letter-spacing:.5px}
-  .muted{color:var(--muted)}
-  .small{font-size:12px}
-  .right-stack{display:grid;gap:18px}
-  .kbd{display:inline-block;padding:2px 6px;border:1px solid #566784;background:#111a2b;border-radius:6px;font-size:11px;color:#d5dfeb}
-  .nav{display:flex;gap:8px;flex-wrap:wrap}
-  .hidden{display:none!important}
-  .match-wrap{display:grid;grid-template-columns:1fr 270px;gap:16px}
-  #gameCanvas{width:100%;height:auto;display:block;border-radius:16px;border:1px solid #45684f;background:#2e9d55;image-rendering:auto}
-  .scorebar{display:flex;align-items:center;justify-content:space-between;background:#101827;border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:10px}
-  .score{font-size:23px;font-weight:900}
-  .minute{color:var(--accent2);font-weight:900}
-  .side-section{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:10px}
-  .side-section:last-child{margin-bottom:0}
-  .controls{line-height:1.75;font-size:13px;color:#c7d3e3}
-  .statline{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f1727;color:#fff;border:1px solid #405574;border-radius:12px;padding:10px 15px;box-shadow:0 12px 32px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s;z-index:10}
-  .toast.show{opacity:1}
-  .overlay{position:fixed;inset:0;background:rgba(4,8,15,.73);display:none;place-items:center;z-index:20}
-  .overlay.show{display:grid}
-  .modal{width:min(520px,92vw);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center}
-  .big-score{font-size:48px;font-weight:1000;margin:6px 0 14px}
-  .champ{font-size:22px;color:var(--accent2);font-weight:900}
-  @media(max-width:900px){.grid,.match-wrap{grid-template-columns:1fr}.team-list{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.app{padding:12px}}
-</style>
+  <meta charset="UTF-8">
+  <title>Quliga 2D Futbol Oyunu</title>
+  <style>
+    body { background: #0b6623; margin: 0; overflow: hidden; }
+    canvas { display: block; margin: auto; background: #228B22; }
+    #scoreboard {
+      position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+      background: white; padding: 10px; border-radius: 5px; font-family: Arial;
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <div class="brand"><div class="ball">⚽</div><div><h1>QULIGA</h1><div class="sub">8 takımlı 2D futbol ligi</div></div></div>
-    <div class="nav">
-      <button class="secondary" id="navLeague">Lig</button>
-      <button class="secondary" id="navTable">Puan Durumu</button>
-      <button class="secondary hidden" id="navMatch">Maç</button>
-    </div>
-  </div>
+  <div id="scoreboard">Skor: 0 - 0</div>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-  <section id="screenStart" class="screen active">
-    <div class="grid">
-      <div class="panel hero">
-        <span class="tag">QULIGA SEZON 1</span>
-        <h2 style="font-size:32px;margin-top:10px">Kendi takımını kur, sahaya çık!</h2>
-        <p>Quliga'da 7 hazır takım ve senin oluşturduğun 1 takım bulunur. Sezon boyunca maçlarını oynayıp puan toplamaya çalış.</p>
-        <div class="form-grid">
-          <div><label>Takımının adı</label><input id="customName" maxlength="24" placeholder="Örn. Beratspor"></div>
-          <div><label>Takım rengin</label><input id="customColor" type="color" value="#35d07f" style="height:46px;padding:4px"></div>
-        </div>
-        <div class="spacer"></div>
-        <button id="createTeam">Takımı Oluştur ve Lige Gir</button>
-        <div class="spacer"></div>
-        <div class="small muted">Kontroller: <span class="kbd">WASD</span>/<span class="kbd">Oklar</span> hareket • <span class="kbd">Space</span> şut • <span class="kbd">Shift</span> hızlan</div>
-      </div>
-      <div class="right-stack">
-        <div class="panel">
-          <h3>Quliga Takımları</h3>
-          <div class="team-list" id="startTeams"></div>
-        </div>
-        <div class="panel">
-          <h3>Bu sürümde</h3>
-          <div class="statline"><span>Lig takımı</span><strong>8</strong></div>
-          <div class="statline"><span>Oynanabilir maç</span><strong>7</strong></div>
-          <div class="statline"><span>Maç süresi</span><strong>90 sn</strong></div>
-          <div class="statline"><span>2D saha</span><strong>Var</strong></div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-  <section id="screenLeague" class="screen">
-    <div class="grid">
-      <div class="panel">
-        <div class="row" style="justify-content:space-between"><div><h2>Quliga Sezonu</h2><div class="sub" id="roundLabel">1. Hafta</div></div><span class="tag" id="playerTeamTag">Takım</span></div>
-        <div id="fixtureList"></div>
-      </div>
-      <div class="right-stack">
-        <div class="panel">
-          <h3>Lig Tablosu</h3>
-          <div id="leagueMini"></div>
-        </div>
-        <div class="panel">
-          <h3>Kurallar</h3>
-          <div class="small muted" style="line-height:1.6">
-            Galibiyet 3, beraberlik 1 puan. Yenilgi 0. Her hafta oyuncunun maçını sen oynarsın; diğer karşılaşmalar simüle edilir.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    // Takımlar
+    const teams = [
+      "Akkağanlar SK", "Perşembe FK 1999", "Kekspor FK",
+      "Adanaspor 01 FK", "Güneşspor", "Boztepe",
+      "Horozspor", "Oyuncu Takımı"
+    ];
 
-  <section id="screenTable" class="screen">
-    <div class="panel">
-      <div class="row" style="justify-content:space-between"><div><h2>Puan Durumu</h2><div class="sub">Quliga Sezon 1</div></div><button class="secondary" id="backLeague">Haftaya Dön</button></div>
-      <div id="fullTable"></div>
-    </div>
-  </section>
+    // Oyuncular
+    let player = { x: 100, y: 250, w: 20, h: 20, color: "blue" };
+    let opponent = { x: 700, y: 250, w: 20, h: 20, color: "red" };
+    let ball = { x: 400, y: 250, r: 10, dx: 2, dy: 2 };
 
-  <section id="screenMatch" class="screen">
-    <div class="scorebar"><div id="homeName">Ev Sahibi</div><div class="score"><span id="homeScore">0</span> - <span id="awayScore">0</span></div><div id="awayName">Deplasman</div><div class="minute" id="matchMinute">00:00</div></div>
-    <div class="match-wrap">
-      <div><canvas id="gameCanvas" width="900" height="520"></canvas></div>
-      <div>
-        <div class="side-section">
-          <h3>Kontroller</h3>
-          <div class="controls">
-            <b>Hareket:</b> WASD / Ok tuşları<br>
-            <b>Şut:</b> Space<br>
-            <b>Hızlan:</b> Shift<br>
-            <b>Pas benzeri kısa dokunuş:</b> E<br>
-            <b>Topa yaklaşınca:</b> otomatik top kontrolü
-          </div>
-        </div>
-        <div class="side-section">
-          <h3>Maç İstatistiği</h3>
-          <div class="statline"><span>Şut</span><strong id="statShots">0</strong></div>
-          <div class="statline"><span>Topa sahip olma</span><strong id="statPoss">50%</strong></div>
-          <div class="statline"><span>Hafta</span><strong id="statRound">1</strong></div>
-        </div>
-        <button class="secondary" style="width:100%" id="forfeit">Maçı Bırak</button>
-      </div>
-    </div>
-  </section>
-</div>
+    let scorePlayer = 0;
+    let scoreOpponent = 0;
 
-<div class="toast" id="toast"></div>
-<div class="overlay" id="resultOverlay">
-  <div class="modal">
-    <div class="tag">MAÇ SONUCU</div>
-    <h2 id="resultTitle">Maç Bitti</h2>
-    <div class="big-score" id="resultScore">0 - 0</div>
-    <div id="resultText" class="muted" style="margin-bottom:16px"></div>
-    <button id="continueSeason">Lig Ekranına Dön</button>
-  </div>
-</div>
+    // Klavye kontrol
+    let keys = {};
+    document.addEventListener("keydown", e => keys[e.key] = true);
+    document.addEventListener("keyup", e => keys[e.key] = false);
 
-<script>
-(() => {
-  "use strict";
+    function update() {
+      // Oyuncu hareketi
+      if (keys["ArrowUp"]) player.y -= 4;
+      if (keys["ArrowDown"]) player.y += 4;
+      if (keys["ArrowLeft"]) player.x -= 4;
+      if (keys["ArrowRight"]) player.x += 4;
 
-  const BASE_TEAMS = [
-    {name:"Akkağanlar SK", color:"#e84b4b", strength:72},
-    {name:"Perşembe FK 1999", color:"#4b86e8", strength:69},
-    {name:"Kekspor FK", color:"#f0bd3d", strength:66},
-    {name:"Adanaspor 01 FK", color:"#ef773b", strength:70},
-    {name:"Güneşspor", color:"#f4d34f", strength:67},
-    {name:"Boztepe", color:"#58c27d", strength:64},
-    {name:"Horozspor", color:"#bf72e8", strength:68}
-  ];
+      // Top hareketi
+      ball.x += ball.dx;
+      ball.y += ball.dy;
 
-  let state = JSON.parse(localStorage.getItem("quligaState") || "null");
-  const $ = id => document.getElementById(id);
-  const screens = ["screenStart","screenLeague","screenTable","screenMatch"];
+      // Kenarlardan sekme
+      if (ball.y < 0 || ball.y > canvas.height) ball.dy *= -1;
 
-  function save(){ localStorage.setItem("quligaState", JSON.stringify(state)); }
-  function showScreen(id){
-    screens.forEach(s => $(s).classList.toggle("active", s === id));
-    $("navMatch").classList.toggle("hidden", id !== "screenMatch" && !(state && state.started));
-    if(id==="screenLeague") renderLeague();
-    if(id==="screenTable") renderTable();
-  }
-  function toast(msg){
-    $("toast").textContent=msg; $("toast").classList.add("show");
-    clearTimeout(toast.t); toast.t=setTimeout(()=> $("toast").classList.remove("show"),1800);
-  }
-  function cloneTeams(playerTeam){
-    return [...BASE_TEAMS, playerTeam];
-  }
-  function teamColor(name){
-    return state.teams.find(t=>t.name===name)?.color || "#35d07f";
-  }
-  function teamIndex(name){ return state.teams.findIndex(t=>t.name===name); }
+      // Gol kontrolü
+      if (ball.x < 0) { scoreOpponent++; resetBall(); }
+      if (ball.x > canvas.width) { scorePlayer++; resetBall(); }
 
-  function initLeague(name,color){
-    const player = {name, color, strength:68, custom:true};
-    const teams = cloneTeams(player);
-    const n = teams.length;
-    const table = {};
-    teams.forEach(t => table[t.name] = {name:t.name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
-    // Circle method for single round robin: 7 rounds, 4 games each.
-    let ids = Array.from({length:n},(_,i)=>i), rounds=[];
-    for(let r=0;r<n-1;r++){
-      const games=[];
-      for(let i=0;i<n/2;i++){
-        const a=ids[i], b=ids[n-1-i];
-        games.push([teams[a].name, teams[b].name]);
-      }
-      rounds.push(games);
-      ids=[ids[0], ids[n-1], ...ids.slice(1,n-1)];
+      // Çarpışma kontrolü
+      if (collision(player, ball)) { ball.dx = 3; ball.dy = (Math.random() - 0.5) * 6; }
+      if (collision(opponent, ball)) { ball.dx = -3; ball.dy = (Math.random() - 0.5) * 6; }
+
+      // Basit AI
+      if (opponent.y < ball.y) opponent.y += 2;
+      if (opponent.y > ball.y) opponent.y -= 2;
+
+      draw();
     }
-    state = {started:true, teams, table, rounds, round:0, playerTeam:name};
-    save(); renderStartTeams(); showScreen("screenLeague");
-    toast(`${name} Quliga'ya katıldı!`);
-  }
 
-  function sortTable(){
-    return Object.values(state.table).sort((a,b) =>
-      b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga) || b.gf-a.gf || a.name.localeCompare(b.name,"tr")
-    );
-  }
-  function updateStats(home,away,hs,as){
-    const h=state.table[home], a=state.table[away];
-    h.p++; a.p++; h.gf+=hs; h.ga+=as; a.gf+=as; a.ga+=hs;
-    if(hs>as){h.w++;a.l++;h.pts+=3}
-    else if(hs<as){a.w++;h.l++;a.pts+=3}
-    else {h.d++;a.d++;h.pts++;a.pts++}
-  }
-  function simulateOtherMatches(playerHome,playerAway){
-    const week=state.rounds[state.round];
-    for(const [h,a] of week){
-      if((h===playerHome && a===playerAway)||(h===playerAway && a===playerHome)) continue;
-      const ht=state.teams[teamIndex(h)], at=state.teams[teamIndex(a)];
-      const diff=(ht.strength-at.strength)/14;
-      const hs=Math.max(0, Math.min(5, Math.round(1.05 + diff + (Math.random()-0.5)*1.7)));
-      const as=Math.max(0, Math.min(5, Math.round(0.92 - diff + (Math.random()-0.5)*1.7)));
-      updateStats(h,a,hs,as);
+    function collision(rect, circle) {
+      return circle.x < rect.x + rect.w &&
+             circle.x > rect.x &&
+             circle.y < rect.y + rect.h &&
+             circle.y > rect.y;
     }
-  }
 
-  function renderStartTeams(){
-    $("startTeams").innerHTML = [...BASE_TEAMS,{name:"Senin takımın",color:"#35d07f",strength:68}]
-      .map(t=>`<div class="team-card"><div class="team-name"><span class="dot" style="background:${t.color}"></span>${t.name}</div><div class="team-meta">Güç ${t.strength}/100</div></div>`).join("");
-  }
-  renderStartTeams();
-
-  function renderLeague(){
-    const week=state.rounds[state.round];
-    $("roundLabel").textContent = `${state.round+1}. Hafta`;
-    $("playerTeamTag").textContent=state.playerTeam;
-    const games = week.map(([h,a]) => {
-      const isPlayer=h===state.playerTeam || a===state.playerTeam;
-      return `<div class="match-card">
-        <div><b>${h}</b><div class="small muted">${a}</div></div>
-        <div class="vs">VS</div>
-        ${isPlayer ? `<button onclick="window.startNextMatch()">Oyna</button>` : `<span class="tag">Simüle</span>`}
-      </div>`;
-    }).join("");
-    $("fixtureList").innerHTML=games;
-    const rows=sortTable().map((t,i)=>{t.gd=t.gf-t.ga;return `<tr><td><b>${i+1}</b> ${t.name}</td><td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gd}</td><td><b>${t.pts}</b></td></tr>`}).join("");
-    $("leagueMini").innerHTML=`<table class="table"><thead><tr><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>A</th><th>P</th></tr></thead><tbody>${rows}</tbody></table>`;
-    $("fullTable").innerHTML=`<table class="table"><thead><tr><th># Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>GF</th><th>GA</th><th>AV</th><th>P</th></tr></thead><tbody>
-      ${sortTable().map((t,i)=>{t.gd=t.gf-t.ga;return `<tr><td><b>${i+1}</b> ${t.name}</td><td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.gd}</td><td><b>${t.pts}</b></td></tr>`}).join("")}
-    </tbody></table>`;
-  }
-
-  window.startNextMatch = () => {
-    const week=state.rounds[state.round];
-    const game=week.find(([h,a])=>h===state.playerTeam||a===state.playerTeam);
-    if(!game) return;
-    startMatch(game[0],game[1]);
-  };
-
-  function startMatch(home,away){
-    state.activeMatch={home,away};
-    save();
-    showScreen("screenMatch");
-    game.start(home,away);
-  }
-
-  function finishMatch(hs,as,forfeit=false){
-    const m=state.activeMatch;
-    updateStats(m.home,m.away,hs,as);
-    simulateOtherMatches(m.home,m.away);
-    const completedRound=state.round+1;
-    state.round++;
-    state.activeMatch=null;
-    save();
-    $("resultScore").textContent=`${hs} - ${as}`;
-    $("resultTitle").textContent=forfeit ? "Maç Sonlandırıldı" : "Maç Bitti";
-    const userScore = m.home===state.playerTeam ? hs : as;
-    const oppScore = m.home===state.playerTeam ? as : hs;
-    const outcome = userScore>oppScore ? "Galibiyet! +3 puan" : userScore<oppScore ? "Mağlubiyet. Gelecek hafta yeni bir şans." : "Beraberlik. +1 puan";
-    $("resultText").textContent=`${m.home} ${hs} - ${as} ${m.away} • ${outcome}`;
-    $("resultOverlay").classList.add("show");
-    if(state.round>=state.rounds.length){
-      $("continueSeason").textContent="Sezon Sonu";
-      $("continueSeason").onclick=()=>{ $("resultOverlay").classList.remove("show"); showSeasonEnd(); };
-    } else {
-      $("continueSeason").textContent=`${completedRound+1}. Haftaya Git`;
-      $("continueSeason").onclick=()=>{ $("resultOverlay").classList.remove("show"); showScreen("screenLeague"); };
+    function resetBall() {
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      ball.dx = (Math.random() > 0.5 ? 2 : -2);
+      ball.dy = (Math.random() - 0.5) * 4;
     }
-  }
 
-  function showSeasonEnd(){
-    const sorted=sortTable(), champ=sorted[0];
-    $("resultTitle").textContent="Quliga Sezonu Tamamlandı";
-    $("resultScore").innerHTML=`<div class="champ">🏆 Şampiyon: ${champ.name}</div>`;
-    $("resultText").textContent=sorted.map((t,i)=>`${i+1}. ${t.name} — ${t.pts} puan`).join(" • ");
-    $("continueSeason").textContent="Puan Durumunu Gör";
-    $("continueSeason").onclick=()=>{$("resultOverlay").classList.remove("show");showScreen("screenTable")};
-    $("resultOverlay").classList.add("show");
-  }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  $("createTeam").onclick=()=>{
-    const name=$("customName").value.trim()||"Beratspor";
-    if(state && state.started){ toast("Yeni takım için önce mevcut sezonu sıfırla."); return; }
-    initLeague(name,$("customColor").value);
-  };
-  $("navLeague").onclick=()=> state?.started ? showScreen("screenLeague") : showScreen("screenStart");
-  $("navTable").onclick=()=> state?.started ? showScreen("screenTable") : toast("Önce takımını oluştur.");
-  $("navMatch").onclick=()=> state?.activeMatch ? showScreen("screenMatch") : toast("Aktif maç yok.");
-  $("backLeague").onclick=()=>showScreen("screenLeague");
-  $("forfeit").onclick=()=>{
-    if(!state.activeMatch) return;
-    if(confirm("Maçı bırakmak istediğine emin misin?")) {
-      game.stop();
-      const m=state.activeMatch;
-      const userIsHome=m.home===state.playerTeam;
-      finishMatch(userIsHome?0:0, userIsHome?3:3, true);
+      // Saha çizgileri
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+      ctx.beginPath();
+      ctx.arc(canvas.width/2, canvas.height/2, 70, 0, Math.PI*2);
+      ctx.stroke();
+
+      // Oyuncu
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+
+      // Rakip
+      ctx.fillStyle = opponent.color;
+      ctx.fillRect(opponent.x, opponent.y, opponent.w, opponent.h);
+
+      // Top
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+      ctx.fill();
+
+      // Skor
+      document.getElementById("scoreboard").innerText = `Skor: ${scorePlayer} - ${scoreOpponent}`;
     }
-  };
 
-  // --- 2D match engine ---
-  const canvas=$("gameCanvas"), ctx=canvas.getContext("2d");
-  const game={
-    running:false, keys:new Set(), players:[], ball:null, home:0, away:0, shots:0, playerSide:"home",
-    start(homeName,awayName){
-      this.running=true; this.last=performance.now(); this.elapsed=0; this.home=0;this.away=0;this.shots=0;
-      $("homeName").textContent=homeName; $("awayName").textContent=awayName;
-      $("homeScore").textContent="0";$("awayScore").textContent="0";$("matchMinute").textContent="00:00";$("statShots").textContent="0";$("statPoss").textContent="50%";$("statRound").textContent=state.round+1;
-      this.homeTeam=state.teams[teamIndex(homeName)]; this.awayTeam=state.teams[teamIndex(awayName)];
-      this.playerSide = homeName===state.playerTeam ? "home":"away";
-      this.resetPositions();
-      window.requestAnimationFrame(t=>this.loop(t));
-    },
-    stop(){this.running=false},
-    resetPositions(){
-      const W=canvas.width,H=canvas.height;
-      this.players=[];
-      const mk=(x,y,side,idx)=>({x,y,vx:0,vy:0,side,idx,r:11,speed:115+Math.random()*16});
-      // 5-a-side representation; player controls the nearest/primary midfielder.
-      const homePos=[[120,260],[250,130],[250,260],[250,390],[390,260]];
-      const awayPos=homePos.map(([x,y])=>[W-x,H-y]);
-      homePos.forEach((p,i)=>this.players.push(mk(p[0],p[1],"home",i)));
-      awayPos.forEach((p,i)=>this.players.push(mk(p[0],p[1],"away",i)));
-      this.controlled=this.players.find(p=>p.side===this.playerSide && p.idx===2) || this.players[0];
-      this.ball={x:W/2,y:H/2,vx:0,vy:0,r:7,owner:null};
-      this.lastKick=0; this.lastPoss=0;
-    },
-    loop(now){
-      if(!this.running) return;
-      const dt=Math.min(.035,(now-this.last)/1000); this.last=now; this.elapsed+=dt;
-      this.update(dt); this.draw();
-      const sec=Math.min(90,Math.floor(this.elapsed));
-      $("matchMinute").textContent=`00:${String(sec).padStart(2,"0")}`;
-      if(this.elapsed>=90){this.running=false; finishMatch(this.home,this.away); return;}
-      window.requestAnimationFrame(t=>this.loop(t));
-    },
-    update(dt){
-      const W=canvas.width,H=canvas.height;
-      const p=this.controlled;
-      let ax=0,ay=0;
-      if(this.keys.has("ArrowLeft")||this.keys.has("a")) ax-=1;
-      if(this.keys.has("ArrowRight")||this.keys.has("d")) ax+=1;
-      if(this.keys.has("ArrowUp")||this.keys.has("w")) ay-=1;
-      if(this.keys.has("ArrowDown")||this.keys.has("s")) ay+=1;
-      const len=Math.hypot(ax,ay)||1;
-      const boost=(this.keys.has("Shift")?1.45:1);
-      const targetSpeed=p.speed*boost;
-      p.vx=ax/len*targetSpeed; p.vy=ay/len*targetSpeed;
-      p.x=Math.max(35,Math.min(W-35,p.x+p.vx*dt)); p.y=Math.max(35,Math.min(H-35,p.y+p.vy*dt));
-
-      // Other players: light AI that gravitates toward zones / ball.
-      for(const pl of this.players){
-        if(pl===p) continue;
-        const ownBallTarget = this.ball.owner && this.ball.owner.side===pl.side;
-        let tx = pl.side==="home" ? (ownBallTarget ? this.ball.x-30 : 240+pl.idx*35) : (ownBallTarget ? this.ball.x+30 : W-(240+pl.idx*35));
-        let ty = pl.y;
-        if(!ownBallTarget && Math.random()<0.015) ty += (Math.random()-.5)*120;
-        if(this.ball.owner===null && Math.random()<0.18){tx=this.ball.x;ty=this.ball.y;}
-        const dx=tx-pl.x,dy=ty-pl.y,d=Math.hypot(dx,dy)||1;
-        pl.x+=dx/d*pl.speed*.42*dt; pl.y+=dy/d*pl.speed*.42*dt;
-        pl.x=Math.max(30,Math.min(W-30,pl.x));pl.y=Math.max(30,Math.min(H-30,pl.y));
-      }
-
-      // Ball possession / dribble.
-      if(this.ball.owner){
-        const owner=this.ball.owner;
-        const forward=owner.side==="home"?1:-1;
-        this.ball.x += (owner===p ? (p.vx*.86*dt) : (forward*20*dt));
-        this.ball.y += (owner===p ? (p.vy*.86*dt) : 0);
-        const dirX=owner.side==="home"?1:-1;
-        this.ball.x = Math.max(18,Math.min(W-18,this.ball.x));
-        this.ball.y = Math.max(18,Math.min(H-18,this.ball.y));
-        this.ball.vx*=0.8; this.ball.vy*=0.8;
-
-        // AI shot chance near goal.
-        const nearGoal=owner.side==="home" ? owner.x>W-115 : owner.x<115;
-        if(owner!==p && nearGoal && Math.random()<0.018){
-          this.kick(owner, owner.side==="home"?1:-1, (H/2-owner.y)/170, 330);
-        }
-      } else {
-        this.ball.x+=this.ball.vx*dt; this.ball.y+=this.ball.vy*dt;
-        this.ball.vx*=Math.pow(0.12,dt); this.ball.vy*=Math.pow(0.12,dt);
-        if(this.ball.y<18||this.ball.y>H-18){this.ball.y=Math.max(18,Math.min(H-18,this.ball.y));this.ball.vy*=-.55}
-        if(this.ball.x<18||this.ball.x>W-18){this.ball.x=Math.max(18,Math.min(W-18,this.ball.x));this.ball.vx*=-.55}
-      }
-
-      // Pick up loose ball.
-      if(!this.ball.owner){
-        for(const pl of this.players){
-          if(Math.hypot(pl.x-this.ball.x,pl.y-this.ball.y)<pl.r+this.ball.r+4){
-            this.ball.owner=pl; break;
-          }
-        }
-      }
-      $("statPoss").textContent = `${Math.round(48+Math.sin(this.elapsed/7)*6 + (this.playerSide==="home"?2:-2))}%`;
-    },
-    kick(owner,dx,dy,power=360){
-      const now=performance.now();
-      if(now-this.lastKick<350) return;
-      this.lastKick=now; this.shots++;
-      this.ball.owner=null; this.ball.vx=dx*power; this.ball.vy=dy*power;
-      if(owner===this.controlled) $("statShots").textContent=this.shots;
-    },
-    draw(){
-      const W=canvas.width,H=canvas.height;
-      ctx.clearRect(0,0,W,H);
-      // grass
-      ctx.fillStyle="#2e9d55";ctx.fillRect(0,0,W,H);
-      for(let i=0;i<10;i++){ctx.fillStyle=i%2?"rgba(255,255,255,.025)":"rgba(0,0,0,.025)";ctx.fillRect(i*W/10,0,W/10,H)}
-      // pitch lines
-      ctx.strokeStyle="rgba(255,255,255,.85)";ctx.lineWidth=4;
-      ctx.strokeRect(18,18,W-36,H-36);
-      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo(W/2,H-18);ctx.stroke();
-      ctx.beginPath();ctx.arc(W/2,H/2,72,0,Math.PI*2);ctx.stroke();
-      ctx.fillStyle="rgba(255,255,255,.9)";ctx.beginPath();ctx.arc(W/2,H/2,5,0,Math.PI*2);ctx.fill();
-      // boxes
-      ctx.strokeRect(18,150,110,220);ctx.strokeRect(W-128,150,110,220);
-      ctx.strokeRect(18,205,52,110);ctx.strokeRect(W-70,205,52,110);
-      // goals
-      ctx.fillStyle="#e7eef5";ctx.fillRect(4,215,14,90);ctx.fillRect(W-18,215,14,90);
-
-      for(const pl of this.players){
-        ctx.beginPath();ctx.arc(pl.x,pl.y,pl.r,0,Math.PI*2);
-        ctx.fillStyle=pl.side==="home"?this.homeTeam.color:this.awayTeam.color;ctx.fill();
-        if(pl===this.controlled){ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.arc(pl.x,pl.y,pl.r+6,0,Math.PI*2);ctx.strokeStyle="rgba(255,255,255,.5)";ctx.lineWidth=2;ctx.stroke()}
-        ctx.fillStyle="rgba(0,0,0,.45)";ctx.font="700 9px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(pl.idx+1,pl.x,pl.y);
-      }
-      // ball
-      ctx.beginPath();ctx.arc(this.ball.x,this.ball.y,this.ball.r,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#1f2631";ctx.lineWidth=1.5;ctx.stroke();
-      // minimal ball center mark
-      ctx.beginPath();ctx.arc(this.ball.x,this.ball.y,2,0,Math.PI*2);ctx.fillStyle="#222";ctx.fill();
-
-      // goal detection
-      if(this.ball.x<9 && this.ball.y>215&&this.ball.y<305){this.goal("away")}
-      if(this.ball.x>W-9 && this.ball.y>215&&this.ball.y<305){this.goal("home")}
-    },
-    goal(side){
-      // prevent double trigger while ball remains in goal
-      this.ball.x=canvas.width/2;this.ball.y=canvas.height/2;this.ball.vx=0;this.ball.vy=0;this.ball.owner=null;
-      if(side==="home"){this.home++;$("homeScore").textContent=this.home;toast(`⚽ ${this.homeTeam.name} gol!`)}
-      else {this.away++;$("awayScore").textContent=this.away;toast(`⚽ ${this.awayTeam.name} gol!`)}
-      this.resetAfterGoal();
-    },
-    resetAfterGoal(){
-      const W=canvas.width,H=canvas.height;
-      this.players.forEach((pl,i)=>{
-        pl.x=pl.side==="home" ? [120,250,250,250,390][pl.idx] : W-[120,250,250,250,390][pl.idx];
-        pl.y=[260,130,260,390,260][pl.idx];
-      });
-      this.controlled=this.players.find(p=>p.side===this.playerSide&&p.idx===2);
-      this.ball.owner=null;
-    }
-  };
-
-  window.addEventListener("keydown",e=>{
-    const key=e.key.length===1?e.key.toLowerCase():e.key;
-    game.keys.add(key);
-    if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].includes(e.key)) e.preventDefault();
-    if(e.code==="Space" && game.running){
-      const p=game.controlled, dx=p.side==="home"?1:-1;
-      const dy=(canvas.height/2-p.y)/160;
-      // close player => strong shot, otherwise still sends ball forward
-      game.kick(p,dx,dy,430);
-    }
-    if(key==="e" && game.running){
-      const p=game.controlled, dx=p.side==="home"?1:-1;
-      game.kick(p,dx,((canvas.height/2-p.y)/220),250);
-    }
-  });
-  window.addEventListener("keyup",e=>game.keys.delete(e.key.length===1?e.key.toLowerCase():e.key));
-
-  // Pre-existing state: reload directly into league.
-  if(state && state.started){
-    showScreen("screenLeague");
-  }
-
-  // Expose a reset in console for testing/development.
-  window.resetQuliga=()=>{localStorage.removeItem("quligaState");location.reload()};
-})();
-</script>
+    setInterval(update, 30);
+  </script>
 </body>
 </html>
