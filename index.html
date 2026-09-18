@@ -2,117 +2,66 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Quliga 2D Futbol Oyunu</title>
+  <title>Quliga Futbol Oyunu</title>
   <style>
-    body { background: #0b6623; margin: 0; overflow: hidden; }
-    canvas { display: block; margin: auto; background: #228B22; }
-    #scoreboard {
-      position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-      background: white; padding: 10px; border-radius: 5px; font-family: Arial;
+    body { 
+      background: linear-gradient(#0b6623, #228B22); 
+      font-family: Arial, sans-serif; 
+      color: white; 
+      text-align: center;
+    }
+    .lobby {
+      margin-top: 100px;
+    }
+    select, button {
+      padding: 10px; 
+      margin: 10px; 
+      font-size: 16px;
+    }
+    #gameCanvas {
+      display: none;
+      margin: auto;
+      background: #228B22;
+      border: 3px solid white;
     }
   </style>
 </head>
 <body>
-  <div id="scoreboard">Skor: 0 - 0</div>
+  <div class="lobby" id="lobby">
+    <h1>Quliga Futbol Ligi</h1>
+    <p>Takımını Seç:</p>
+    <select id="teamSelect">
+      <option>Akkağanlar SK</option>
+      <option>Perşembe FK 1999</option>
+      <option>Kekspor FK</option>
+      <option>Adanaspor 01 FK</option>
+      <option>Güneşspor</option>
+      <option>Boztepe</option>
+      <option>Horozspor</option>
+      <option>Oyuncu Takımı</option>
+    </select>
+    <br>
+    <p>Oyun Modu:</p>
+    <select id="modeSelect">
+      <option>Hızlı Maç</option>
+      <option>Lig Maçı</option>
+      <option>Turnuva</option>
+    </select>
+    <br>
+    <button onclick="startGame()">Oyuna Başla</button>
+  </div>
+
   <canvas id="gameCanvas" width="800" height="500"></canvas>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    // Takımlar
-    const teams = [
-      "Akkağanlar SK", "Perşembe FK 1999", "Kekspor FK",
-      "Adanaspor 01 FK", "Güneşspor", "Boztepe",
-      "Horozspor", "Oyuncu Takımı"
-    ];
-
-    // Oyuncular
-    let player = { x: 100, y: 250, w: 20, h: 20, color: "blue" };
-    let opponent = { x: 700, y: 250, w: 20, h: 20, color: "red" };
-    let ball = { x: 400, y: 250, r: 10, dx: 2, dy: 2 };
-
-    let scorePlayer = 0;
-    let scoreOpponent = 0;
-
-    // Klavye kontrol
-    let keys = {};
-    document.addEventListener("keydown", e => keys[e.key] = true);
-    document.addEventListener("keyup", e => keys[e.key] = false);
-
-    function update() {
-      // Oyuncu hareketi
-      if (keys["ArrowUp"]) player.y -= 4;
-      if (keys["ArrowDown"]) player.y += 4;
-      if (keys["ArrowLeft"]) player.x -= 4;
-      if (keys["ArrowRight"]) player.x += 4;
-
-      // Top hareketi
-      ball.x += ball.dx;
-      ball.y += ball.dy;
-
-      // Kenarlardan sekme
-      if (ball.y < 0 || ball.y > canvas.height) ball.dy *= -1;
-
-      // Gol kontrolü
-      if (ball.x < 0) { scoreOpponent++; resetBall(); }
-      if (ball.x > canvas.width) { scorePlayer++; resetBall(); }
-
-      // Çarpışma kontrolü
-      if (collision(player, ball)) { ball.dx = 3; ball.dy = (Math.random() - 0.5) * 6; }
-      if (collision(opponent, ball)) { ball.dx = -3; ball.dy = (Math.random() - 0.5) * 6; }
-
-      // Basit AI
-      if (opponent.y < ball.y) opponent.y += 2;
-      if (opponent.y > ball.y) opponent.y -= 2;
-
-      draw();
+    function startGame() {
+      const team = document.getElementById("teamSelect").value;
+      const mode = document.getElementById("modeSelect").value;
+      document.getElementById("lobby").style.display = "none";
+      document.getElementById("gameCanvas").style.display = "block";
+      alert(team + " ile " + mode + " başlıyor!");
+      // Burada oyun motorunu başlatabilirsin
     }
-
-    function collision(rect, circle) {
-      return circle.x < rect.x + rect.w &&
-             circle.x > rect.x &&
-             circle.y < rect.y + rect.h &&
-             circle.y > rect.y;
-    }
-
-    function resetBall() {
-      ball.x = canvas.width / 2;
-      ball.y = canvas.height / 2;
-      ball.dx = (Math.random() > 0.5 ? 2 : -2);
-      ball.dy = (Math.random() - 0.5) * 4;
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Saha çizgileri
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-      ctx.beginPath();
-      ctx.arc(canvas.width/2, canvas.height/2, 70, 0, Math.PI*2);
-      ctx.stroke();
-
-      // Oyuncu
-      ctx.fillStyle = player.color;
-      ctx.fillRect(player.x, player.y, player.w, player.h);
-
-      // Rakip
-      ctx.fillStyle = opponent.color;
-      ctx.fillRect(opponent.x, opponent.y, opponent.w, opponent.h);
-
-      // Top
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-      ctx.fill();
-
-      // Skor
-      document.getElementById("scoreboard").innerText = `Skor: ${scorePlayer} - ${scoreOpponent}`;
-    }
-
-    setInterval(update, 30);
   </script>
 </body>
 </html>
