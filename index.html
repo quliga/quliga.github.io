@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quliga 2D Futbol</title>
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        #gameArea {
+            display: none;
+            margin: 0 auto;
+        }
+        canvas {
+            background-color: #27ae60;
+            border: 5px solid #ecf0f1;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .menu {
+            background: #34495e;
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 50px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        #scoreboard {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="startMenu" class="menu">
+        <h1>🏆 QULIGA'YA HOŞ GELDİNİZ 🏆</h1>
+        <p>Takımını Yarat ve Efsanelere Karşı Mücadele Et!</p>
+        <p style="font-size: 14px; color: #bdc3c7;">Rakipler: Akkağanlar SK, Perşembe FK 1999, Kekspor FK, Adanaspor 01 FK, Güneşspor, Boztepe, Horozspor</p>
+        <input type="text" id="teamName" placeholder="Takımınızın Adını Girin" maxlength="20">
+        <br>
+        <button onclick="startGame()">Lige Başla (Maça Çık)</button>
+    </div>
+
+    <div id="gameArea">
+        <div id="scoreboard"><span id="p1Name">Sen</span> 0 - 0 <span id="p2Name">Rakip</span></div>
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <p>Kontroller: <b>YÖN TUŞLARI</b> ile hareket et. Topa çarparak vur!</p>
+    </div>
+
+    <script>
+        // Quliga Lig Takımları
+        const quligaTeams = [
+            "Akkağanlar SK", 
+            "Perşembe FK 1999", 
+            "Kekspor FK", 
+            "Adanaspor 01 FK", 
+            "Güneşspor", 
+            "Boztepe", 
+            "Horozspor"
+        ];
+
+        let myTeam = "";
+        let opponentTeam = "";
+        let score = { player: 0, cpu: 0 };
+
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Oyun Nesneleri
+        const ball = { x: 400, y: 250, radius: 10, vx: 0, vy: 0, speed: 0.97 };
+        const player = { x: 200, y: 250, radius: 15, speed: 5, dx: 0, dy: 0, color: '#3498db' };
+        const cpu = { x: 600, y: 250, radius: 15, speed: 2.5, color: '#e74c3c' }; // CPU biraz daha yavaş
+
+        // Tuş Kontrolleri
+        const keys = {};
+        window.addEventListener("keydown", (e) => keys[e.key] = true);
+        window.addEventListener("keyup", (e) => keys[e.key] = false);
+
+        function startGame() {
+            const nameInput = document.getElementById("teamName").value.trim();
+            if (!nameInput) {
+                alert("Lütfen önce takımınızın adını girin!");
+                return;
+            }
+            myTeam = nameInput;
+            opponentTeam = quligaTeams[Math.floor(Math.random() * quligaTeams.length)];
+
+            document.getElementById("startMenu").style.display = "none";
+            document.getElementById("gameArea").style.display = "block";
+            
+            document.getElementById("p1Name").innerText = myTeam;
+            document.getElementById("p2Name").innerText = opponentTeam;
+
+            resetPositions();
+            gameLoop();
+        }
+
+        function resetPositions() {
+            ball.x = 400; ball.y = 250; ball.vx = 0; ball.vy = 0;
+            player.x = 200; player.y = 250;
+            cpu.x = 600; cpu.y = 250;
+        }
+
+        function update() {
+            // Oyuncu Hareketi (Yön Tuşları)
+            if (keys["ArrowUp"] && player.y > player.radius) player.y -= player.speed;
+            if (keys["ArrowDown"] && player.y < canvas.height - player.radius) player.y += player.speed;
+            if (keys["ArrowLeft"] && player.x > player.radius) player.x -= player.speed;
+            if (keys["ArrowRight"] && player.x < canvas.width - player.radius) player.x += player.speed;
+
+            // Basit Yapay Zeka (Topu Takip Et)
+            if (cpu.x < ball.x) cpu.x += cpu.speed;
+            if (cpu.x > ball.x) cpu.x -= cpu.speed;
+            if (cpu.y < ball.y) cpu.y += cpu.speed;
+            if (cpu.y > ball.y) cpu.y -= cpu.speed;
+
+            // Top Fiziği (Sürtünme)
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            ball.vx *= ball.speed;
+            ball.vy *= ball.speed;
+
+            // Saha Kenarı Çarpışmaları (Top)
+            if (ball.y < ball.radius || ball.y > canvas.height - ball.radius) ball.vy *= -1;
+            if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
+                // Kale Kontrolü (Y ekseninde ortada 150px genişliğinde kale)
+                if (ball.y > 175 && ball.y < 325) {
+                    if (ball.x < ball.radius) {
+                        score.cpu++; // CPU Gol attı
+                        updateScore();
+                    } else if (ball.x > canvas.width - ball.radius) {
+                        score.player++; // Oyuncu Gol attı
+                        updateScore();
+                    }
+                } else {
+                    ball.vx *= -1; // Duvar çarpması
+                }
+            }
+
+            // Oyuncu - Top Çarpışması
+            let dxP = ball.x - player.x;
+            let dyP = ball.y - player.y;
+            let distP = Math.sqrt(dxP * dxP + dyP * dyP);
+            if (distP < ball.radius + player.radius) {
+                ball.vx = (dxP / distP) * 8; // Vuruş gücü
+                ball.vy = (dyP / distP) * 8;
+            }
+
+            // CPU - Top Çarpışması
+            let dxC = ball.x - cpu.x;
+            let dyC = ball.y - cpu.y;
+            let distC = Math.sqrt(dxC * dxC + dyC * dyC);
+            if (distC < ball.radius + cpu.radius) {
+                ball.vx = (dxC / distC) * 6; // CPU vuruş gücü
+                ball.vy = (dyC / distC) * 6;
+            }
+        }
+
+        function updateScore() {
+            document.getElementById("p1Name").innerText = myTeam;
+            document.getElementById("p2Name").innerText = opponentTeam;
+            document.getElementById("scoreboard").innerHTML = `<span style="color:#3498db">${myTeam}</span> ${score.player} - ${score.cpu} <span style="color:#e74c3c">${opponentTeam}</span>`;
+            resetPositions();
+        }
+
+        function draw() {
+            // Saha Arka Planı
+            ctx.fillStyle = "#27ae60";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Saha Çizgileri
+            ctx.strokeStyle = "rgba(255,255,255,0.5)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(400, 0);
+            ctx.lineTo(400, 500); // Orta saha çizgisi
+            ctx.arc(400, 250, 50, 0, Math.PI * 2); // Orta yuvarlak
+            ctx.stroke();
+
+            // Kaleler (Sol ve Sağ)
+            ctx.fillStyle = "rgba(255,255,255,0.3)";
+            ctx.fillRect(0, 175, 40, 150);
+            ctx.fillRect(760, 175, 40, 150);
+
+            // Oyuncu (Sen)
+            ctx.fillStyle = player.color;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // CPU (Rakip)
+            ctx.fillStyle = cpu.color;
+            ctx.beginPath();
+            ctx.arc(cpu.x, cpu.y, cpu.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Top
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#000";
+            ctx.stroke();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+</html>
