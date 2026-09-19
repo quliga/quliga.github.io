@@ -6,4 +6,5 @@
 # GITHUB: https://github.com/quliga
 # TÜR: TARAYICI OYUNU
 # DESTEKLENEN DİLLER: TÜRKÇE (TR)
+# PRE-ALPHA BAŞLANGICI: 18 EYLÜL 2026
 ---
