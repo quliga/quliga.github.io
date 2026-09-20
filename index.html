@@ -3,132 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>QULIGA - 2D Arcade Futbol Ligi</title>
+    <title>QULIGA v2.0 - 2D Arcade Futbol Ligi</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         .font-teko { font-family: 'Teko', sans-serif; }
         .font-inter { font-family: 'Inter', sans-serif; }
         
-        /* Prevent text selection and default touch scroll behaviors during gameplay */
+        /* Prevent selection & touch defaults */
         canvas, .no-select {
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
         }
 
-        /* Custom Scrollbar for Standings Table */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0f172a;
+            background: #090d16;
         }
         ::-webkit-scrollbar-thumb {
-            background: #334155;
+            background: #1e293b;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
+            background: #334155;
         }
 
         /* Glassmorphism UI Effects */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        /* Glow Animations */
-        @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.6)); }
-            50% { filter: drop-shadow(0 0 25px rgba(234, 179, 8, 0.9)); }
+        /* Animated Title Glow */
+        @keyframes title-pulse {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.5)); }
+            50% { filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.9)); }
         }
         .glow-title {
-            animation: pulse-glow 3s infinite ease-in-out;
+            animation: title-pulse 3s infinite ease-in-out;
         }
 
-        /* Mobile Touch Buttons */
+        /* Commentary Banner Bounce */
+        @keyframes banner-pop {
+            0% { transform: scale(0.6) translateY(-20px); opacity: 0; }
+            60% { transform: scale(1.08) translateY(0); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-banner {
+            animation: banner-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Mobile Controls Styling */
         .touch-btn {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(8px);
             border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.08s ease, background-color 0.08s ease;
         }
         .touch-btn:active {
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(0.95);
+            background: rgba(245, 158, 11, 0.5);
+            transform: scale(0.92);
         }
     </style>
 </head>
 <body class="bg-slate-950 text-white font-inter h-screen w-screen overflow-hidden flex flex-col justify-center items-center select-none">
 
-    <!-- MAIN GAME WRAPPER -->
+    <!-- MAIN GAME CONTAINER -->
     <div id="app-container" class="relative w-full h-full max-w-[1280px] max-h-[720px] aspect-video bg-slate-900 md:rounded-2xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col">
 
         <!-- ========================================== -->
         <!-- SCREEN 1: MAIN MENU                        -->
         <!-- ========================================== -->
-        <div id="screen-menu" class="absolute inset-0 z-30 flex flex-col justify-between items-center p-8 bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950">
-            <!-- Title Header -->
-            <div class="mt-8 text-center">
-                <div class="inline-block px-4 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-teko text-2xl tracking-widest uppercase mb-2">
-                    Türkiye 2D Arcade Futbol Ligi
+        <div id="screen-menu" class="absolute inset-0 z-30 flex flex-col justify-between items-center p-6 md:p-8 bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950">
+            <!-- Header Branding -->
+            <div class="mt-6 md:mt-8 text-center">
+                <div class="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-teko text-2xl tracking-widest uppercase mb-2">
+                    <span>⚡ TÜRKİYE 2D ARCADE FUTBOL LİGİ</span>
+                    <span class="text-xs px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold">v2.0</span>
                 </div>
-                <h1 class="font-teko text-8xl md:text-9xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-300 drop-shadow-2xl glow-title leading-none">
+                <h1 class="font-teko text-8xl md:text-9xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300 drop-shadow-2xl glow-title leading-none">
                     QULIGA
                 </h1>
-                <p class="text-slate-400 text-sm md:text-base font-semibold tracking-wide">Kendi Takımını Kur, 9 Haftalık Ligde Şampiyonluğa Koş!</p>
+                <p class="text-slate-400 text-sm md:text-base font-semibold tracking-wide max-w-md mx-auto">
+                    Kendi Takımını Tasarla, 9 Haftalık Ligde Mücadele Et, Kulübünü Geliştir ve Şampiyon Ol!
+                </p>
             </div>
 
-            <!-- Menu Action Buttons -->
-            <div class="flex flex-col space-y-4 w-full max-w-xs">
-                <button id="btn-new-career" class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-teko text-3xl font-extrabold tracking-wider rounded-xl shadow-lg shadow-amber-500/20 hover:scale-105 transition-all cursor-pointer border border-amber-300">
-                    YENİ KARİYER
+            <!-- Action Buttons -->
+            <div class="flex flex-col space-y-3.5 w-full max-w-xs">
+                <button id="btn-new-career" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-teko text-3xl font-extrabold tracking-wider rounded-xl shadow-lg shadow-amber-500/20 hover:scale-105 transition-all cursor-pointer border border-amber-300 flex justify-center items-center space-x-2">
+                    <span>🏆</span> <span>YENİ KARİYER</span>
                 </button>
-                <button id="btn-how-to-play" class="w-full py-3 bg-slate-800/80 hover:bg-slate-700/80 text-white font-teko text-2xl font-bold tracking-wider rounded-xl border border-slate-700 hover:scale-105 transition-all cursor-pointer">
-                    NASIL OYNANIR?
+                <button id="btn-how-to-play" class="w-full py-3 bg-slate-800/90 hover:bg-slate-700 text-white font-teko text-2xl font-bold tracking-wider rounded-xl border border-slate-700 hover:scale-105 transition-all cursor-pointer flex justify-center items-center space-x-2">
+                    <span>🎮</span> <span>NASIL OYNANIR?</span>
                 </button>
             </div>
 
-            <!-- Footer Info -->
-            <div class="text-xs text-slate-500 font-mono">
-                QULIGA PRE-ALPHA 1.1 • quliga.github.io
+            <!-- Footer -->
+            <div class="text-xs text-slate-500 font-mono flex items-center space-x-4">
+                <span>QULIGA PRE-ALPHA v2.0</span>
+                <span>•</span>
+                <span>3D top fiziği & Kayarak Müdahale</span>
             </div>
         </div>
 
         <!-- HOW TO PLAY MODAL -->
         <div id="modal-how-to" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex justify-center items-center p-6 hidden">
-            <div class="glass-panel p-6 md:p-8 rounded-2xl max-w-lg w-full text-left space-y-4 border border-slate-700">
-                <h2 class="font-teko text-4xl text-amber-400 font-bold tracking-wide border-b border-slate-800 pb-2">NASIL OYNANIR?</h2>
+            <div class="glass-panel p-6 md:p-8 rounded-2xl max-w-xl w-full text-left space-y-4 border border-slate-700 overflow-y-auto max-h-[90vh]">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h2 class="font-teko text-4xl text-amber-400 font-bold tracking-wide">🎮 NASIL OYNANIR?</h2>
+                    <button id="btn-close-how-to-x" class="text-slate-400 hover:text-white font-bold text-xl">✕</button>
+                </div>
                 
-                <div class="space-y-3 text-sm text-slate-300">
-                    <div>
-                        <h3 class="font-bold text-amber-300 uppercase tracking-wider text-xs">🎮 Klavyeli Kontroller</h3>
-                        <p class="mt-1"><span class="text-white font-semibold">WASD / Yön Tuşları:</span> Oyuncuyu Hareket Ettir</p>
-                        <p><span class="text-white font-semibold">Pas / Müdahale:</span> Z veya Boşluk (Space)</p>
-                        <p><span class="text-white font-semibold">Şut / Sert Vuruş:</span> X veya Sol Shift</p>
-                        <p><span class="text-white font-semibold">Oyuncu Değiştir:</span> C Tuşu</p>
+                <div class="space-y-4 text-sm text-slate-300">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-amber-300 uppercase tracking-wider text-xs mb-1.5">💻 Klavye Kontrolleri</h3>
+                        <p class="mt-1"><span class="text-amber-400 font-semibold">WASD / Yön Tuşları:</span> Hareket et</p>
+                        <p><span class="text-amber-400 font-semibold">Z / Boşluk (Space):</span> Yerden Pas / Savunmada Kayarak Müdahale</p>
+                        <p><span class="text-amber-400 font-semibold">X / Shift:</span> Sert Şut (Basılı tutarak güç barını doldur!)</p>
+                        <p><span class="text-amber-400 font-semibold">C Tuşu:</span> En yakın oyuncuya geç</p>
+                        <p><span class="text-amber-400 font-semibold">V / E Tuşu:</span> Depar / Hızlı Koşu (Stamina harcar)</p>
+                        <p><span class="text-amber-400 font-semibold">ESC:</span> Oyunu Duraklat / Taktik Değiştir</p>
                     </div>
 
-                    <div>
-                        <h3 class="font-bold text-amber-300 uppercase tracking-wider text-xs">📱 Mobil Kontroller</h3>
-                        <p class="mt-1">Sol ekrandaki <span class="text-white font-semibold">Sanal Joystick</span> ile hareket et, sağ alttaki <span class="text-white font-semibold">PAS</span> ve <span class="text-white font-semibold">ŞUT</span> butonlarını kullan.</p>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-amber-300 uppercase tracking-wider text-xs mb-1.5">📱 Mobil Kontroller</h3>
+                        <p>Sol ekrandaki <span class="text-white font-semibold">Sanal Joystick</span> ile yön ver. Sağdaki <span class="text-amber-400 font-semibold">PAS</span>, <span class="text-amber-400 font-semibold">ŞUT</span>, <span class="text-amber-400 font-semibold">DEPAR</span> ve <span class="text-amber-400 font-semibold">TAKTİK</span> butonlarını kullan.</p>
                     </div>
 
-                    <div>
-                        <h3 class="font-bold text-amber-300 uppercase tracking-wider text-xs">🏆 Quliga Formatı</h3>
-                        <p class="mt-1">10 takımlı ligde 9 hafta boyunca her takımla 1 maç yaparsın. Galibiyet 3P, Beraberlik 1P kazandırır. 9. Hafta sonunda lider olan takım <span class="text-amber-400 font-bold">QULIGA ŞAMPİYONU</span> olur!</p>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-amber-300 uppercase tracking-wider text-xs mb-1.5">⭐ Yeni Özellikler</h3>
+                        <p>• <span class="text-white font-semibold">3D Top Fiziği:</span> Top havaya yükselir, falsolu şutlar atılabilir ve direklerden sekebilir!</p>
+                        <p>• <span class="text-white font-semibold">Kayarak Müdahale:</span> Rakip topa sahipken Z/Pas tuşuna basarak topu temiz bir müdahaleyle kap!</p>
+                        <p>• <span class="text-white font-semibold">Kulüp Mağazası:</span> Kazanılan altınlarla Takım Hızı, Şut Gücü, Savunma ve Kaleci yeteneklerini geliştir!</p>
                     </div>
                 </div>
 
-                <button id="btn-close-how-to" class="w-full mt-4 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-teko text-2xl font-bold tracking-wider rounded-xl cursor-pointer">
-                    ANLADIM, KAPAT
+                <button id="btn-close-how-to" class="w-full mt-2 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-teko text-2xl font-bold tracking-wider rounded-xl cursor-pointer">
+                    ANLADIM, OYUNA BAŞLA
                 </button>
             </div>
         </div>
@@ -137,26 +160,23 @@
         <!-- SCREEN 2: TEAM CREATION                    -->
         <!-- ========================================== -->
         <div id="screen-create" class="absolute inset-0 z-30 flex flex-col justify-center items-center p-6 bg-slate-950 hidden">
-            <div class="glass-panel p-8 rounded-2xl max-w-md w-full border border-slate-800 space-y-6">
+            <div class="glass-panel p-6 md:p-8 rounded-2xl max-w-md w-full border border-slate-800 space-y-5">
                 <div class="text-center">
                     <h2 class="font-teko text-5xl font-bold text-amber-400 tracking-wider">TAKIMINI OLUŞTUR</h2>
-                    <p class="text-xs text-slate-400">Quliga'da mücadele edecek kendi kulübünü tasarla</p>
+                    <p class="text-xs text-slate-400">QULIGA'da mücadele edecek kulübünü özelleştir</p>
                 </div>
 
                 <div class="space-y-4 text-left">
-                    <!-- Team Name Input -->
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Takım Adı</label>
                         <input id="input-team-name" type="text" maxlength="18" value="Anadolu Gücü" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold focus:outline-none focus:border-amber-500 transition-colors">
                     </div>
 
-                    <!-- Short Tag Input -->
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Takım Kısaltması (3 Harf)</label>
                         <input id="input-team-tag" type="text" maxlength="3" value="ANG" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold uppercase focus:outline-none focus:border-amber-500 transition-colors">
                     </div>
 
-                    <!-- Color Pickers -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Ana Forma Rengi</label>
@@ -168,23 +188,23 @@
                         </div>
                     </div>
 
-                    <!-- Live Jersey Preview -->
+                    <!-- Live Preview -->
                     <div class="pt-2 flex items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-800">
                         <span class="text-xs text-slate-400 font-semibold">Forma Önizleme:</span>
                         <div class="flex items-center space-x-2">
-                            <div id="preview-jersey" class="w-8 h-8 rounded-full border-2 border-white flex justify-center items-center font-bold text-xs shadow-md" style="background-color: #dc2626; color: #ffffff;">
+                            <div id="preview-jersey" class="w-9 h-9 rounded-full border-2 border-white flex justify-center items-center font-bold text-xs shadow-md" style="background-color: #dc2626; color: #ffffff;">
                                 9
                             </div>
-                            <span id="preview-tag" class="font-teko text-xl font-bold text-amber-400">ANG</span>
+                            <span id="preview-tag" class="font-teko text-2xl font-bold text-amber-400">ANG</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex space-x-3">
+                <div class="flex space-x-3 pt-2">
                     <button id="btn-back-to-menu" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-teko text-2xl font-bold rounded-xl border border-slate-700">
                         GERİ
                     </button>
-                    <button id="btn-start-league" class="w-2/3 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-teko text-2xl font-extrabold tracking-wider rounded-xl shadow-lg border border-amber-300">
+                    <button id="btn-start-league" class="w-2/3 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-teko text-2xl font-extrabold tracking-wider rounded-xl shadow-lg border border-amber-300 cursor-pointer">
                         LİGİ BAŞLAT
                     </button>
                 </div>
@@ -195,8 +215,8 @@
         <!-- SCREEN 3: LEAGUE DASHBOARD / HUB           -->
         <!-- ========================================== -->
         <div id="screen-dashboard" class="absolute inset-0 z-30 flex flex-col bg-slate-950 p-4 md:p-6 hidden">
-            <!-- Dashboard Header Bar -->
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+            <!-- Header Bar -->
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
                 <div class="flex items-center space-x-3">
                     <h1 class="font-teko text-4xl font-extrabold text-amber-400 tracking-wider">QULIGA</h1>
                     <span id="dashboard-week-badge" class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full font-teko text-xl tracking-wider">
@@ -204,64 +224,159 @@
                     </span>
                 </div>
 
+                <!-- User Stats & Coins -->
                 <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+                    <div class="flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg">
+                        <span class="text-amber-400 text-sm">🪙</span>
+                        <span id="dash-coins" class="font-bold text-sm text-amber-300">0 Altın</span>
+                    </div>
+
+                    <div class="flex items-center space-x-2 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
                         <div id="dash-user-color" class="w-4 h-4 rounded-full border border-white"></div>
                         <span id="dash-user-name" class="font-bold text-sm text-white">Anadolu Gücü</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Tab Buttons -->
+            <div class="flex space-x-2 mb-3">
+                <button id="tab-standings" class="px-4 py-1.5 rounded-lg font-teko text-xl font-bold bg-amber-500 text-slate-950 border border-amber-400 transition-all">
+                    PUAN DURUMU
+                </button>
+                <button id="tab-scorers" class="px-4 py-1.5 rounded-lg font-teko text-xl font-bold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white transition-all">
+                    GOL KRALLIĞI
+                </button>
+                <button id="tab-store" class="px-4 py-1.5 rounded-lg font-teko text-xl font-bold bg-slate-900 text-slate-400 border border-slate-800 hover:text-white transition-all flex items-center space-x-1">
+                    <span>⚡ KULÜP GELİŞTİRME</span>
+                </button>
+            </div>
+
             <!-- Dashboard Main Content Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 overflow-hidden">
-                <!-- Standings Table (2 Columns on Desktop) -->
-                <div class="md:col-span-2 glass-panel p-4 rounded-xl flex flex-col overflow-hidden border border-slate-800">
-                    <h3 class="font-teko text-2xl text-amber-400 font-bold tracking-wider mb-2 flex items-center justify-between">
-                        <span>PUAN DURUMU</span>
-                        <span class="text-xs font-sans text-slate-400 font-normal">9 Hafta • Tek Devreli</span>
-                    </h3>
-
-                    <div class="overflow-y-auto flex-1 pr-1">
-                        <table class="w-full text-left border-collapse text-xs md:text-sm">
-                            <thead>
-                                <tr class="text-slate-400 border-b border-slate-800 font-bold uppercase tracking-wider text-[11px]">
-                                    <th class="py-2 pl-2 w-8">#</th>
-                                    <th class="py-2">TAKIM</th>
-                                    <th class="py-2 text-center w-8">O</th>
-                                    <th class="py-2 text-center w-8">G</th>
-                                    <th class="py-2 text-center w-8">B</th>
-                                    <th class="py-2 text-center w-8">M</th>
-                                    <th class="py-2 text-center w-10">AG</th>
-                                    <th class="py-2 text-center w-10">YG</th>
-                                    <th class="py-2 text-center w-10">AV</th>
-                                    <th class="py-2 text-center w-10 text-amber-400 font-extrabold">P</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-standings-body" class="divide-y divide-slate-800/60 font-medium">
-                                <!-- Standings rows rendered via JS -->
-                            </tbody>
-                        </table>
+                
+                <!-- Left Panel: Dynamic Tabs Content -->
+                <div id="panel-tab-content" class="md:col-span-2 glass-panel p-4 rounded-xl flex flex-col overflow-hidden border border-slate-800">
+                    
+                    <!-- TAB 1: STANDINGS -->
+                    <div id="view-standings" class="flex flex-col h-full overflow-hidden">
+                        <h3 class="font-teko text-2xl text-amber-400 font-bold tracking-wider mb-2 flex items-center justify-between">
+                            <span>LİG PUAN DURUMU</span>
+                            <span class="text-xs font-sans text-slate-400 font-normal">9 Hafta • Tek Devreli</span>
+                        </h3>
+                        <div class="overflow-y-auto flex-1 pr-1">
+                            <table class="w-full text-left border-collapse text-xs md:text-sm">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-800 font-bold uppercase tracking-wider text-[11px]">
+                                        <th class="py-2 pl-2 w-8">#</th>
+                                        <th class="py-2">TAKIM</th>
+                                        <th class="py-2 text-center w-8">O</th>
+                                        <th class="py-2 text-center w-8">G</th>
+                                        <th class="py-2 text-center w-8">B</th>
+                                        <th class="py-2 text-center w-8">M</th>
+                                        <th class="py-2 text-center w-10">AG</th>
+                                        <th class="py-2 text-center w-10">YG</th>
+                                        <th class="py-2 text-center w-10">AV</th>
+                                        <th class="py-2 text-center w-10 text-amber-400 font-extrabold">P</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-standings-body" class="divide-y divide-slate-800/60 font-medium">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
+                    <!-- TAB 2: TOP SCORERS -->
+                    <div id="view-scorers" class="flex flex-col h-full overflow-hidden hidden">
+                        <h3 class="font-teko text-2xl text-amber-400 font-bold tracking-wider mb-2">
+                            GOL KRALLIĞI
+                        </h3>
+                        <div class="overflow-y-auto flex-1 pr-1">
+                            <table class="w-full text-left border-collapse text-xs md:text-sm">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-800 font-bold uppercase tracking-wider text-[11px]">
+                                        <th class="py-2 pl-2 w-8">#</th>
+                                        <th class="py-2">OYUNCU</th>
+                                        <th class="py-2">TAKIM</th>
+                                        <th class="py-2 text-right pr-4 text-amber-400 font-extrabold">GOL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-scorers-body" class="divide-y divide-slate-800/60 font-medium">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: CLUB UPGRADE STORE -->
+                    <div id="view-store" class="flex flex-col h-full overflow-y-auto pr-1 hidden space-y-3">
+                        <h3 class="font-teko text-2xl text-amber-400 font-bold tracking-wider">
+                            KULÜP GELİŞTİRME MAĞAZASI
+                        </h3>
+                        <p class="text-xs text-slate-400 -mt-2">Maç kazandıkça kazandığın altınlarla takım özelliklerini geliştir!</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                            <!-- Speed Upgrade -->
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-white text-sm">⚡ Oyuncu Hızı</div>
+                                    <div id="lvl-speed" class="text-xs text-amber-400 font-semibold">Seviye: 1 (+0%)</div>
+                                </div>
+                                <button id="btn-buy-speed" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg cursor-pointer">
+                                    100 🪙 Geliştir
+                                </button>
+                            </div>
+
+                            <!-- Shoot Power Upgrade -->
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-white text-sm">🎯 Şut Gücü</div>
+                                    <div id="lvl-shoot" class="text-xs text-amber-400 font-semibold">Seviye: 1 (+0%)</div>
+                                </div>
+                                <button id="btn-buy-shoot" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg cursor-pointer">
+                                    100 🪙 Geliştir
+                                </button>
+                            </div>
+
+                            <!-- Defense Upgrade -->
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-white text-sm">🛡️ Müdahale & Dayanıklılık</div>
+                                    <div id="lvl-defense" class="text-xs text-amber-400 font-semibold">Seviye: 1 (+0%)</div>
+                                </div>
+                                <button id="btn-buy-defense" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg cursor-pointer">
+                                    100 🪙 Geliştir
+                                </button>
+                            </div>
+
+                            <!-- GK Upgrade -->
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-white text-sm">🧤 Kaleci Refleksi</div>
+                                    <div id="lvl-gk" class="text-xs text-amber-400 font-semibold">Seviye: 1 (+0%)</div>
+                                </div>
+                                <button id="btn-buy-gk" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg cursor-pointer">
+                                    100 🪙 Geliştir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- Right Column: Current Week Fixtures & Play Button -->
+                <!-- Right Panel: Fixtures & Play Match -->
                 <div class="glass-panel p-4 rounded-xl flex flex-col justify-between border border-slate-800">
                     <div class="flex flex-col flex-1 overflow-hidden">
                         <h3 class="font-teko text-2xl text-amber-400 font-bold tracking-wider mb-2">
                             HAFTANIN MAÇLARI
                         </h3>
-
                         <div id="list-weekly-fixtures" class="space-y-2 overflow-y-auto flex-1 pr-1 text-xs">
-                            <!-- Fixture items rendered via JS -->
                         </div>
                     </div>
 
-                    <!-- Next Match Action Card -->
+                    <!-- Next Match Box -->
                     <div class="mt-4 pt-3 border-t border-slate-800">
                         <div class="text-center mb-2">
                             <span class="text-[11px] text-slate-400 uppercase font-bold tracking-widest">SIRADAKİ RAKİP</span>
                             <div id="next-opponent-box" class="text-lg font-bold text-white mt-0.5 flex justify-center items-center space-x-2">
-                                <!-- Next opponent name & color rendered via JS -->
                             </div>
                         </div>
 
@@ -270,6 +385,7 @@
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -289,10 +405,15 @@
                     <span id="hud-home-score" class="font-teko text-3xl md:text-5xl text-amber-400 font-black min-w-[24px] text-center">0</span>
                 </div>
 
-                <!-- Match Timer -->
-                <div class="flex flex-col items-center bg-slate-900/90 backdrop-blur px-4 py-1 rounded-lg border border-slate-700">
-                    <span id="hud-timer" class="font-teko text-2xl md:text-4xl font-bold tracking-widest text-amber-400">01:00</span>
-                    <span class="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">QULIGA</span>
+                <!-- Match Timer & Pause Button -->
+                <div class="flex items-center space-x-2">
+                    <div class="flex flex-col items-center bg-slate-900/90 backdrop-blur px-4 py-1 rounded-lg border border-slate-700">
+                        <span id="hud-timer" class="font-teko text-2xl md:text-4xl font-bold tracking-widest text-amber-400">01:00</span>
+                        <span class="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">QULIGA</span>
+                    </div>
+                    <button id="btn-pause-game" class="pointer-events-auto w-9 h-9 bg-slate-900/90 border border-slate-700 rounded-lg flex justify-center items-center text-white hover:bg-slate-800 font-bold text-sm">
+                        ⏸️
+                    </button>
                 </div>
 
                 <!-- Away Team -->
@@ -303,31 +424,79 @@
                 </div>
             </div>
 
-            <!-- Goal Overlay Banner -->
-            <div id="goal-banner" class="absolute inset-0 bg-amber-500/20 backdrop-blur-sm flex flex-col justify-center items-center z-30 pointer-events-none opacity-0 transition-opacity duration-300">
-                <h2 class="font-teko text-8xl md:text-9xl font-extrabold tracking-widest text-amber-300 drop-shadow-[0_10px_10px_rgba(0,0,0,0.9)] animate-bounce">
+            <!-- Dynamic Commentary Banner Overlay -->
+            <div id="commentary-banner" class="absolute top-16 left-1/2 transform -translate-x-1/2 z-30 pointer-events-none opacity-0 transition-opacity duration-300">
+                <div id="commentary-text" class="font-teko text-3xl md:text-4xl text-amber-300 tracking-wider bg-slate-950/90 px-6 py-1.5 rounded-full border border-amber-400/60 shadow-2xl animate-banner">
                     GOOOOL!
-                </h2>
-                <div id="goal-scorer-text" class="font-teko text-3xl md:text-4xl text-white tracking-wider bg-slate-950/80 px-6 py-1.5 rounded-full border border-amber-400/50">
-                    ANADOLU GÜCÜ ATTI!
                 </div>
             </div>
 
-            <!-- Mobile Touch Controls Container -->
+            <!-- Mobile Touch Controls -->
             <div id="touch-controls" class="absolute inset-0 pointer-events-none flex justify-between items-end p-4 z-20 hidden">
-                <!-- Left D-Pad -->
-                <div class="relative w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur rounded-full border border-white/20 pointer-events-auto flex justify-center items-center touch-none" id="dpad-zone">
-                    <div id="dpad-stick" class="w-12 h-12 md:w-16 md:h-16 bg-amber-400/50 rounded-full border border-white shadow-lg pointer-events-none transform translate-x-0 translate-y-0"></div>
+                <!-- Virtual Joystick Zone -->
+                <div class="relative w-32 h-32 md:w-36 md:h-36 bg-white/10 backdrop-blur rounded-full border border-white/20 pointer-events-auto flex justify-center items-center touch-none" id="dpad-zone">
+                    <div id="dpad-stick" class="w-12 h-12 md:w-14 md:h-14 bg-amber-400/60 rounded-full border border-white shadow-lg pointer-events-none transform translate-x-0 translate-y-0"></div>
                 </div>
 
-                <!-- Right Action Buttons -->
-                <div class="flex space-x-3 pointer-events-auto">
-                    <button id="btn-touch-pass" class="touch-btn w-16 h-16 md:w-20 md:h-20 rounded-full flex flex-col justify-center items-center text-xs font-bold text-white shadow-lg active:scale-95">
-                        <span class="text-lg">🎯</span> PAS
+                <!-- Action Buttons -->
+                <div class="flex items-end space-x-2 pointer-events-auto">
+                    <button id="btn-touch-tactic" class="touch-btn w-12 h-12 rounded-full flex justify-center items-center text-xs font-bold text-amber-300 bg-slate-900/80 mb-2">
+                        📋
                     </button>
-                    <button id="btn-touch-shoot" class="touch-btn w-20 h-20 md:w-24 md:h-24 bg-amber-500/60 border-amber-300 rounded-full flex flex-col justify-center items-center text-sm font-bold text-white shadow-lg active:scale-95">
-                        <span class="text-xl">⚽</span> ŞUT
+                    <button id="btn-touch-sprint" class="touch-btn w-14 h-14 rounded-full flex justify-center items-center text-xs font-bold text-cyan-300 bg-cyan-950/40">
+                        ⚡ DEPAR
                     </button>
+                    <button id="btn-touch-pass" class="touch-btn w-16 h-16 rounded-full flex flex-col justify-center items-center text-xs font-bold text-white shadow-lg">
+                        🎯 PAS
+                    </button>
+                    <button id="btn-touch-shoot" class="touch-btn w-20 h-20 bg-amber-500/60 border-amber-300 rounded-full flex flex-col justify-center items-center text-sm font-bold text-white shadow-lg">
+                        ⚽ ŞUT
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAUSE & TACTICS MODAL -->
+            <div id="modal-pause" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex justify-center items-center p-6 hidden">
+                <div class="glass-panel p-6 md:p-8 rounded-2xl max-w-lg w-full text-center border border-slate-700 space-y-5">
+                    <h2 class="font-teko text-5xl font-bold text-amber-400 tracking-wider">MAÇ DURAKLATILDI</h2>
+
+                    <!-- Live Match Stats -->
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <h4 class="font-bold text-amber-300 uppercase tracking-wider text-center border-b border-slate-800 pb-1">CANLI MAÇ İSTATİSTİKLERİ</h4>
+                        <div class="grid grid-cols-3 gap-2 text-center pt-1 font-semibold">
+                            <span id="stat-home-shots" class="text-white">0</span>
+                            <span class="text-slate-400">Şutlar</span>
+                            <span id="stat-away-shots" class="text-white">0</span>
+
+                            <span id="stat-home-ontarget" class="text-white">0</span>
+                            <span class="text-slate-400">İsabetli Şut</span>
+                            <span id="stat-away-ontarget" class="text-white">0</span>
+
+                            <span id="stat-home-possession" class="text-amber-400">50%</span>
+                            <span class="text-slate-400">Topla Oynama</span>
+                            <span id="stat-away-possession" class="text-amber-400">50%</span>
+
+                            <span id="stat-home-tackles" class="text-white">0</span>
+                            <span class="text-slate-400">Müdahaleler</span>
+                            <span id="stat-away-tackles" class="text-white">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Tactics Switcher -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Taktik Düzen</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button id="btn-tactic-balanced" class="py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-lg border border-amber-400">Dengeli (2-2)</button>
+                            <button id="btn-tactic-attack" class="py-2 bg-slate-900 text-slate-300 font-bold text-xs rounded-lg border border-slate-800 hover:bg-slate-800">Hücum (1-1-2)</button>
+                            <button id="btn-tactic-defend" class="py-2 bg-slate-900 text-slate-300 font-bold text-xs rounded-lg border border-slate-800 hover:bg-slate-800">Savunma (3-1)</button>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                        <button id="btn-resume-game" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-teko text-3xl font-extrabold tracking-wider rounded-xl cursor-pointer">
+                            DEVAM ET
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -336,20 +505,25 @@
         <!-- SCREEN 5: POST MATCH SUMMARY               -->
         <!-- ========================================== -->
         <div id="screen-postmatch" class="absolute inset-0 z-30 flex flex-col justify-center items-center p-6 bg-slate-950/95 backdrop-blur-md hidden">
-            <div class="glass-panel p-6 md:p-8 rounded-2xl max-w-lg w-full text-center border border-slate-800 space-y-6">
+            <div class="glass-panel p-6 md:p-8 rounded-2xl max-w-lg w-full text-center border border-slate-800 space-y-5">
                 <div>
                     <span class="text-amber-400 font-teko text-2xl tracking-widest uppercase">MAÇ SONUCU</span>
-                    <div id="post-match-score" class="font-teko text-7xl font-extrabold text-white my-1">
+                    <div id="post-match-score" class="font-teko text-7xl font-extrabold text-white my-0.5">
                         2 - 1
                     </div>
                     <p id="post-match-headline" class="text-sm font-semibold text-slate-300">Harika Galibiyet!</p>
                 </div>
 
-                <!-- Other Simulated Matches of the Week -->
-                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-left">
+                <!-- Earned Coins Banner -->
+                <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl flex justify-center items-center space-x-2 text-amber-300 font-bold text-sm">
+                    <span>🪙 Kazanılan Altın:</span>
+                    <span id="post-earned-coins" class="text-lg font-black text-amber-400">+150 🪙</span>
+                </div>
+
+                <!-- Simulated Matches of the Week -->
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-left">
                     <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">HAFTANIN DİĞER SONUÇLARI</h4>
                     <div id="simulated-results-list" class="space-y-1.5 text-xs text-slate-300 font-mono">
-                        <!-- Simulated match results rendered via JS -->
                     </div>
                 </div>
 
@@ -381,7 +555,7 @@
 
     </div>
 
-    <!-- GAME ENGINE & LEAGUE LOGIC SCRIPT -->
+    <!-- GAME ENGINE & AUDIO ENGINE SCRIPT -->
     <script>
         class SoundEngine {
             constructor() {
@@ -412,8 +586,8 @@
                 lfoGain.gain.setValueAtTime(300, now);
                 lfo.connect(osc1.frequency);
 
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
 
                 osc1.connect(gain);
                 osc2.connect(gain);
@@ -422,9 +596,9 @@
                 osc1.start(now);
                 osc2.start(now);
                 lfo.start(now);
-                osc1.stop(now + 0.4);
-                osc2.stop(now + 0.4);
-                lfo.stop(now + 0.4);
+                osc1.stop(now + 0.45);
+                osc2.stop(now + 0.45);
+                lfo.stop(now + 0.45);
             }
 
             playKick(power = 1) {
@@ -434,23 +608,83 @@
                 const gain = this.ctx.createGain();
 
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(160 * power, now);
-                osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+                osc.frequency.setValueAtTime(180 * Math.min(power, 1.4), now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.14);
 
-                gain.gain.setValueAtTime(0.3 * Math.min(power, 1.5), now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                gain.gain.setValueAtTime(0.35 * Math.min(power, 1.5), now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
 
                 osc.start(now);
-                osc.stop(now + 0.12);
+                osc.stop(now + 0.14);
+            }
+
+            playBounce() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.08);
+            }
+
+            playTackle() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(90, now);
+                osc.frequency.exponentialRampToValueAtTime(20, now + 0.2);
+
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+
+            playPostHit() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.2);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.2);
             }
 
             playGoalCheer() {
                 if (!this.ctx) return;
                 const now = this.ctx.currentTime;
-                const bufferSize = this.ctx.sampleRate * 1.5;
+                const bufferSize = this.ctx.sampleRate * 1.8;
                 const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                 const data = buffer.getChannelData(0);
 
@@ -463,40 +697,20 @@
 
                 const filter = this.ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(400, now);
-                filter.frequency.linearRampToValueAtTime(1200, now + 0.5);
+                filter.frequency.setValueAtTime(350, now);
+                filter.frequency.linearRampToValueAtTime(1400, now + 0.6);
 
                 const gain = this.ctx.createGain();
                 gain.gain.setValueAtTime(0.01, now);
-                gain.gain.linearRampToValueAtTime(0.3, now + 0.3);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+                gain.gain.linearRampToValueAtTime(0.35, now + 0.4);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 1.8);
 
                 noise.connect(filter);
                 filter.connect(gain);
                 gain.connect(this.ctx.destination);
 
                 noise.start(now);
-                noise.stop(now + 1.5);
-            }
-
-            playPostHit() {
-                if (!this.ctx) return;
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
-
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start(now);
-                osc.stop(now + 0.15);
+                noise.stop(now + 1.8);
             }
         }
 
@@ -518,15 +732,17 @@
         // LEAGUE DATA STRUCTURE
         let league = {
             teams: [],
-            fixtures: [], // 9 weeks, 5 matches each
-            currentWeek: 1
+            fixtures: [],
+            currentWeek: 1,
+            userCoins: 0,
+            userUpgrades: { speed: 0, shoot: 0, defense: 0, gk: 0 },
+            topScorers: {}
         };
 
-        // Round-Robin Fixture Generator for 10 Teams
         function generateRoundRobinFixtures(teams) {
-            const n = teams.length; // 10
-            const rounds = n - 1; // 9 weeks
-            const matchesPerRound = n / 2; // 5 matches
+            const n = teams.length;
+            const rounds = n - 1;
+            const matchesPerRound = n / 2;
             const fixtures = [];
 
             let teamIndexes = teams.map((_, i) => i);
@@ -539,8 +755,6 @@
                     roundMatches.push({ homeId: teams[home].id, awayId: teams[away].id, homeScore: null, awayScore: null });
                 }
                 fixtures.push(roundMatches);
-
-                // Rotate team indexes (keeping fixed index 0)
                 teamIndexes.splice(1, 0, teamIndexes.pop());
             }
 
@@ -563,15 +777,86 @@
             }
         };
 
-        const keys = { Up: false, Down: false, Left: false, Right: false, Shoot: false, Pass: false, Switch: false };
-        let touchJoystick = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
+        class ParticleSystem {
+            constructor() {
+                this.particles = [];
+            }
+
+            addSparks(x, y) {
+                for (let i = 0; i < 12; i++) {
+                    this.particles.push({
+                        x, y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8,
+                        life: 1.0,
+                        color: '#f59e0b',
+                        size: 3
+                    });
+                }
+            }
+
+            addTurfDust(x, y) {
+                for (let i = 0; i < 8; i++) {
+                    this.particles.push({
+                        x, y,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        life: 0.8,
+                        color: '#22c55e',
+                        size: 4
+                    });
+                }
+            }
+
+            addConfetti() {
+                for (let i = 0; i < 60; i++) {
+                    this.particles.push({
+                        x: Math.random() * FIELD.width,
+                        y: Math.random() * FIELD.height,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: Math.random() * 4 + 2,
+                        life: 1.5,
+                        color: ['#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#ffffff'][Math.floor(Math.random() * 5)],
+                        size: 5
+                    });
+                }
+            }
+
+            update() {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.03;
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+
+            draw(ctx) {
+                this.particles.forEach(p => {
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, p.life);
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+            }
+        }
+
+        const particles = new ParticleSystem();
 
         class Ball {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
+                this.z = 0; // 3D Height simulation
                 this.vx = 0;
                 this.vy = 0;
+                this.vz = 0;
                 this.radius = 8;
                 this.friction = 0.982;
             }
@@ -579,13 +864,30 @@
             reset(x, y) {
                 this.x = x;
                 this.y = y;
+                this.z = 0;
                 this.vx = 0;
                 this.vy = 0;
+                this.vz = 0;
             }
 
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
+                this.z += this.vz;
+
+                // 3D Height Physics
+                if (this.z > 0) {
+                    this.vz -= 0.35; // Gravity
+                } else {
+                    this.z = 0;
+                    if (Math.abs(this.vz) > 1) {
+                        this.vz = -this.vz * 0.5; // Bounce damping
+                        audio.playBounce();
+                    } else {
+                        this.vz = 0;
+                    }
+                }
+
                 this.vx *= this.friction;
                 this.vy *= this.friction;
 
@@ -612,7 +914,7 @@
                     audio.playKick(0.3);
                 }
 
-                // Endlines & Goal Area
+                // Endlines & Post Check
                 if (this.y < goalTop || this.y > goalBottom) {
                     if (this.x - this.radius < left) {
                         this.x = left + this.radius;
@@ -631,12 +933,14 @@
                     ];
 
                     posts.forEach(p => {
-                        if (Vec.dist(this, p) < this.radius + 6) {
+                        if (Vec.dist(this, p) < this.radius + 6 && this.z < 25) {
                             const n = Vec.norm({ x: this.x - p.x, y: this.y - p.y });
                             const speed = Math.hypot(this.vx, this.vy) || 4;
-                            this.vx = n.x * speed * 0.8;
-                            this.vy = n.y * speed * 0.8;
+                            this.vx = n.x * speed * 0.85;
+                            this.vy = n.y * speed * 0.85;
                             audio.playPostHit();
+                            particles.addSparks(p.x, p.y);
+                            showCommentary("DİREKTEN DÖNDÜ!");
                         }
                     });
 
@@ -652,13 +956,17 @@
             }
 
             draw(ctx) {
+                // Ball Ground Shadow (Grows with z height)
+                const shadowScale = 1 / (1 + this.z * 0.04);
                 ctx.beginPath();
-                ctx.ellipse(this.x + 3, this.y + 4, this.radius, this.radius * 0.6, 0, 0, Math.PI * 2);
+                ctx.ellipse(this.x, this.y + 3, this.radius * shadowScale, (this.radius * 0.6) * shadowScale, 0, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
                 ctx.fill();
 
+                // Ball Body (Elevated by z)
+                const drawY = this.y - this.z;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.arc(this.x, drawY, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
                 ctx.strokeStyle = '#000000';
@@ -666,11 +974,14 @@
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.arc(this.x - 2, this.y - 2, this.radius * 0.4, 0, Math.PI * 2);
+                ctx.arc(this.x - 2, drawY - 2, this.radius * 0.4, 0, Math.PI * 2);
                 ctx.fillStyle = '#1e293b';
                 ctx.fill();
             }
         }
+
+        const keys = { Up: false, Down: false, Left: false, Right: false, Shoot: false, Pass: false, Switch: false, Sprint: false };
+        let touchJoystick = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
 
         class Player {
             constructor(x, y, teamData, isHome, role, number) {
@@ -681,12 +992,13 @@
                 this.vx = 0;
                 this.vy = 0;
                 this.teamData = teamData;
-                this.isHome = isHome; // true = Left side, false = Right side
+                this.isHome = isHome;
                 this.role = role;
                 this.number = number;
                 this.radius = 14;
-                this.baseSpeed = 3.5 * (teamData.rating || 1.0);
+                this.stamina = 100;
                 this.kickCooldown = 0;
+                this.slidingTimer = 0;
                 this.facing = { x: isHome ? 1 : -1, y: 0 };
             }
 
@@ -695,11 +1007,46 @@
                 this.y = this.startY;
                 this.vx = 0;
                 this.vy = 0;
+                this.stamina = 100;
                 this.kickCooldown = 0;
+                this.slidingTimer = 0;
+            }
+
+            getSpeed() {
+                let speed = 3.5 * (this.teamData.rating || 1.0);
+                if (this.teamData.isUser) {
+                    speed += (league.userUpgrades.speed * 0.2);
+                }
+                return speed;
             }
 
             update(ball, isControlled, teamPlayers, opponentPlayers, activeMatch) {
                 if (this.kickCooldown > 0) this.kickCooldown--;
+
+                // Sliding Mechanic
+                if (this.slidingTimer > 0) {
+                    this.slidingTimer--;
+                    this.x += this.facing.x * 5.5;
+                    this.y += this.facing.y * 5.5;
+                    particles.addTurfDust(this.x, this.y);
+
+                    // Slide Tackle Ball Hit
+                    if (Vec.dist(this, ball) < this.radius + ball.radius + 6) {
+                        ball.vx = this.facing.x * 8;
+                        ball.vy = this.facing.y * 8;
+                        ball.vz = 2;
+                        audio.playTackle();
+                        showCommentary("KRİTİK MÜDAHALE!");
+                        activeMatch.stats[this.isHome ? 'homeTackles' : 'awayTackles']++;
+                        this.slidingTimer = 0;
+                    }
+                    return;
+                }
+
+                // Stamina Regen
+                if (!keys.Sprint && this.stamina < 100) {
+                    this.stamina += 0.25;
+                }
 
                 if (isControlled) {
                     this.handleUserControls(ball, teamPlayers, activeMatch);
@@ -720,9 +1067,9 @@
                 this.x = Math.max(minX, Math.min(maxX, this.x));
                 this.y = Math.max(minY, Math.min(maxY, this.y));
 
-                // Ball Handling Physics
+                // Dribble contact
                 const distToBall = Vec.dist(this, ball);
-                if (distToBall < this.radius + ball.radius + 2) {
+                if (distToBall < this.radius + ball.radius + 2 && ball.z < 18) {
                     if (this.kickCooldown === 0) {
                         const moveSpeed = Math.hypot(this.vx, this.vy);
                         if (moveSpeed > 0.5) {
@@ -752,36 +1099,58 @@
                     dy = touchJoystick.dy;
                 }
 
+                let speedMultiplier = 1.0;
+                if (keys.Sprint && this.stamina > 5) {
+                    speedMultiplier = 1.45;
+                    this.stamina -= 0.6;
+                }
+
                 if (dx !== 0 || dy !== 0) {
                     const norm = Vec.norm({ x: dx, y: dy });
-                    this.vx = norm.x * 3.7;
-                    this.vy = norm.y * 3.7;
+                    this.vx = norm.x * this.getSpeed() * speedMultiplier;
+                    this.vy = norm.y * this.getSpeed() * speedMultiplier;
                     this.facing = norm;
                 }
 
-                // Shoot
-                if (keys.Shoot && this.kickCooldown === 0) {
+                // Power Shoot Charging
+                if (keys.Shoot) {
+                    activeMatch.shootCharge = Math.min(100, activeMatch.shootCharge + 3.5);
+                } else if (activeMatch.shootCharge > 0) {
+                    // Release Shot
                     const distToBall = Vec.dist(this, ball);
-                    if (distToBall < this.radius + ball.radius + 10) {
+                    if (distToBall < this.radius + ball.radius + 12) {
+                        const power = activeMatch.shootCharge / 100;
                         const targetGoalX = this.isHome ? FIELD.width - FIELD.margin : FIELD.margin;
                         let shootDir = this.facing;
 
-                        if ((this.isHome && this.x > FIELD.width * 0.5) || (!this.isHome && this.x < FIELD.width * 0.5)) {
+                        if ((this.isHome && this.x > FIELD.width * 0.4) || (!this.isHome && this.x < FIELD.width * 0.4)) {
                             shootDir = Vec.norm({ x: targetGoalX - ball.x, y: FIELD.height / 2 - ball.y });
                         }
 
-                        ball.vx = shootDir.x * 14;
-                        ball.vy = shootDir.y * 14;
-                        this.kickCooldown = 20;
-                        audio.playKick(1.4);
-                        keys.Shoot = false;
+                        let shotSpeed = 7 + power * 10;
+                        if (this.teamData.isUser) shotSpeed += (league.userUpgrades.shoot * 0.5);
+
+                        ball.vx = shootDir.x * shotSpeed;
+                        ball.vy = shootDir.y * shotSpeed;
+                        ball.vz = 1.5 + power * 3.5;
+                        this.kickCooldown = 22;
+                        audio.playKick(1.2 + power * 0.5);
+
+                        activeMatch.stats[this.isHome ? 'homeShots' : 'awayShots']++;
+                        if (Math.abs(shootDir.y) < 0.4) {
+                            activeMatch.stats[this.isHome ? 'homeOnTarget' : 'awayOnTarget']++;
+                        }
+
+                        if (power > 0.7) showCommentary("MÜTHİŞ ŞUT!");
                     }
+                    activeMatch.shootCharge = 0;
                 }
 
-                // Pass
+                // Pass or Tackle
                 if (keys.Pass && this.kickCooldown === 0) {
                     const distToBall = Vec.dist(this, ball);
                     if (distToBall < this.radius + ball.radius + 12) {
+                        // Clean Ground Pass
                         let bestTeammate = null;
                         let minDist = 9999;
 
@@ -797,14 +1166,19 @@
 
                         if (bestTeammate) {
                             const passDir = Vec.norm({ x: bestTeammate.x - ball.x, y: bestTeammate.y - ball.y });
-                            ball.vx = passDir.x * 105;
-                            ball.vy = passDir.y * 10;
-                            this.kickCooldown = 20;
-                            audio.playKick(0.9);
+                            ball.vx = passDir.x * 9.5;
+                            ball.vy = passDir.y * 9.5;
+                            ball.vz = 1.2;
+                            this.kickCooldown = 18;
+                            audio.playKick(0.85);
                             activeMatch.controlledPlayer = bestTeammate;
                         }
-                        keys.Pass = false;
+                    } else if (distToBall > 20) {
+                        // Slide Tackle Mechanic when away from ball
+                        this.slidingTimer = 20;
+                        audio.playTackle();
                     }
+                    keys.Pass = false;
                 }
             }
 
@@ -819,19 +1193,24 @@
                     targetY = Math.max(goalCenterY - maxGKReach, Math.min(goalCenterY + maxGKReach, targetY));
 
                     const dy = targetY - this.y;
-                    this.vy = Math.sign(dy) * Math.min(Math.abs(dy), this.baseSpeed * 0.85);
+                    let gkSpeed = this.getSpeed() * 0.85;
+                    if (this.teamData.isUser) gkSpeed += (league.userUpgrades.gk * 0.2);
 
-                    if (Vec.dist(this, ball) < this.radius + ball.radius + 6 && this.kickCooldown === 0) {
+                    this.vy = Math.sign(dy) * Math.min(Math.abs(dy), gkSpeed);
+
+                    if (Vec.dist(this, ball) < this.radius + ball.radius + 8 && this.kickCooldown === 0) {
                         const clearDir = Vec.norm({ x: targetGoalX - this.x, y: (Math.random() - 0.5) * 200 });
-                        ball.vx = clearDir.x * 12;
-                        ball.vy = clearDir.y * 12;
+                        ball.vx = clearDir.x * 11;
+                        ball.vy = clearDir.y * 11;
+                        ball.vz = 3;
                         this.kickCooldown = 25;
                         audio.playKick(1.2);
+                        showCommentary("KALECİ ÇIKARDI!");
                     }
                     return;
                 }
 
-                // Find closest teammate to ball
+                // Chaser AI selection
                 let closestTeammate = teamPlayers[0];
                 let minDist = Vec.dist(ball, teamPlayers[0]);
                 teamPlayers.forEach(p => {
@@ -844,12 +1223,10 @@
                     }
                 });
 
-                const isChaser = (closestTeammate === this);
-
-                if (isChaser) {
+                if (closestTeammate === this) {
                     const dir = Vec.norm({ x: ball.x - this.x, y: ball.y - this.y });
-                    this.vx = dir.x * this.baseSpeed;
-                    this.vy = dir.y * this.baseSpeed;
+                    this.vx = dir.x * this.getSpeed();
+                    this.vy = dir.y * this.getSpeed();
                     this.facing = dir;
 
                     if (Vec.dist(this, ball) < this.radius + ball.radius + 4 && this.kickCooldown === 0) {
@@ -860,12 +1237,13 @@
                             const shootDir = Vec.norm({ x: targetGoalX - this.x, y: shootTargetY - this.y });
                             ball.vx = shootDir.x * 12;
                             ball.vy = shootDir.y * 12;
+                            ball.vz = 2;
                             this.kickCooldown = 25;
                             audio.playKick(1.3);
                         } else {
                             const moveDir = Vec.norm({ x: targetGoalX - this.x, y: (FIELD.height / 2 - this.y) * 0.5 });
-                            ball.vx = moveDir.x * 5;
-                            ball.vy = moveDir.y * 5;
+                            ball.vx = moveDir.x * 5.5;
+                            ball.vy = moveDir.y * 5.5;
                             this.kickCooldown = 15;
                         }
                     }
@@ -879,20 +1257,20 @@
                     const distToHome = Vec.dist(this, { x: homeX, y: homeY });
 
                     if (distToHome > 20) {
-                        this.vx = dir.x * (this.baseSpeed * 0.65);
-                        this.vy = dir.y * (this.baseSpeed * 0.65);
+                        this.vx = dir.x * (this.getSpeed() * 0.65);
+                        this.vy = dir.y * (this.getSpeed() * 0.65);
                     }
                 }
             }
 
             draw(ctx, isControlled) {
-                // Shadow
+                // Player Shadow
                 ctx.beginPath();
                 ctx.ellipse(this.x + 3, this.y + 4, this.radius, this.radius * 0.65, 0, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
                 ctx.fill();
 
-                // Body
+                // Player Jersey Body
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = this.teamData.colorPrimary;
@@ -901,25 +1279,32 @@
                 ctx.lineWidth = 2.5;
                 ctx.stroke();
 
-                // Number
+                // Kit Number
                 ctx.fillStyle = this.teamData.colorSecondary;
                 ctx.font = 'bold 11px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(this.number, this.x, this.y + 1);
 
-                // Controlled Player Highlight Ring
+                // Controlled Highlight Indicator & Stamina Ring
                 if (isControlled) {
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
                     ctx.strokeStyle = '#f59e0b';
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 2.5;
                     ctx.stroke();
 
+                    // Stamina Bar Below
+                    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                    ctx.fillRect(this.x - 14, this.y + 18, 28, 4);
+                    ctx.fillStyle = this.stamina > 30 ? '#22c55e' : '#ef4444';
+                    ctx.fillRect(this.x - 14, this.y + 18, (this.stamina / 100) * 28, 4);
+
+                    // Direction Arrow
                     ctx.beginPath();
-                    ctx.moveTo(this.x, this.y - this.radius - 12);
-                    ctx.lineTo(this.x - 5, this.y - this.radius - 18);
-                    ctx.lineTo(this.x + 5, this.y - this.radius - 18);
+                    ctx.moveTo(this.x, this.y - this.radius - 10);
+                    ctx.lineTo(this.x - 5, this.y - this.radius - 16);
+                    ctx.lineTo(this.x + 5, this.y - this.radius - 16);
                     ctx.closePath();
                     ctx.fillStyle = '#f59e0b';
                     ctx.fill();
@@ -934,11 +1319,20 @@
                 this.isUserHome = isUserHome;
                 this.scoreHome = 0;
                 this.scoreAway = 0;
-                this.timer = 60; // 60-second fast arcade matches
-                this.state = 'PLAYING'; // PLAYING, GOAL, FINISHED
+                this.timer = 60;
+                this.state = 'PLAYING';
                 this.goalTimer = 0;
-                this.ball = new Ball(FIELD.width / 2, FIELD.height / 2);
+                this.shootCharge = 0;
+                this.currentTactic = 'BALANCED';
 
+                this.stats = {
+                    homeShots: 0, awayShots: 0,
+                    homeOnTarget: 0, awayOnTarget: 0,
+                    homeTackles: 0, awayTackles: 0,
+                    homePossessionFrames: 0, awayPossessionFrames: 0
+                };
+
+                this.ball = new Ball(FIELD.width / 2, FIELD.height / 2);
                 this.homePlayers = [];
                 this.awayPlayers = [];
                 this.controlledPlayer = null;
@@ -947,7 +1341,6 @@
             }
 
             initPlayers() {
-                // Home Team (Left) - 5 Players (1 GK + 4 Outfield)
                 this.homePlayers = [
                     new Player(FIELD.margin + 20, FIELD.height / 2, this.homeTeamData, true, 'GK', 1),
                     new Player(260, FIELD.height / 2 - 130, this.homeTeamData, true, 'DEF', 3),
@@ -956,7 +1349,6 @@
                     new Player(550, FIELD.height / 2, this.homeTeamData, true, 'FWD', 9)
                 ];
 
-                // Away Team (Right) - 5 Players
                 this.awayPlayers = [
                     new Player(FIELD.width - FIELD.margin - 20, FIELD.height / 2, this.awayTeamData, false, 'GK', 1),
                     new Player(FIELD.width - 260, FIELD.height / 2 - 130, this.awayTeamData, false, 'DEF', 2),
@@ -966,6 +1358,25 @@
                 ];
 
                 this.controlledPlayer = this.isUserHome ? this.homePlayers[4] : this.awayPlayers[4];
+            }
+
+            setTactic(tactic) {
+                this.currentTactic = tactic;
+                const userPlayers = this.isUserHome ? this.homePlayers : this.awayPlayers;
+
+                if (tactic === 'ATTACK') {
+                    userPlayers[1].startX = 380; // Push DEF up
+                    userPlayers[3].startX = 520;
+                    userPlayers[4].startX = 620;
+                } else if (tactic === 'DEFEND') {
+                    userPlayers[1].startX = 200;
+                    userPlayers[2].startX = 200;
+                    userPlayers[3].startX = 320;
+                } else {
+                    userPlayers[1].startX = 260;
+                    userPlayers[2].startX = 260;
+                    userPlayers[3].startX = 440;
+                }
             }
 
             resetKickoff() {
@@ -984,7 +1395,7 @@
                         this.timer = 0;
                         this.state = 'FINISHED';
                         audio.playWhistle();
-                        finishUserMatch(this.scoreHome, this.scoreAway);
+                        finishUserMatch(this.scoreHome, this.scoreAway, this.stats);
                         return;
                     }
                 }
@@ -995,9 +1406,13 @@
                 }
 
                 this.ball.update();
+                particles.update();
 
-                const userTeam = this.isUserHome ? this.homePlayers : this.awayPlayers;
-                const opponentTeam = this.isUserHome ? this.awayPlayers : this.homePlayers;
+                // Track possession
+                const homeDist = Vec.dist(this.ball, this.homePlayers[4]);
+                const awayDist = Vec.dist(this.ball, this.awayPlayers[4]);
+                if (homeDist < awayDist) this.stats.homePossessionFrames++;
+                else this.stats.awayPossessionFrames++;
 
                 this.homePlayers.forEach(p => p.update(this.ball, p === this.controlledPlayer, this.homePlayers, this.awayPlayers, this));
                 this.awayPlayers.forEach(p => p.update(this.ball, p === this.controlledPlayer, this.awayPlayers, this.homePlayers, this));
@@ -1007,7 +1422,7 @@
                 } else if (this.state === 'GOAL') {
                     this.goalTimer -= dt;
                     if (this.goalTimer <= 0) {
-                        document.getElementById('goal-banner').classList.add('opacity-0');
+                        document.getElementById('commentary-banner').classList.add('opacity-0');
                         this.state = 'PLAYING';
                         this.resetKickoff();
                         audio.playWhistle();
@@ -1037,15 +1452,14 @@
                 const goalTop = FIELD.height / 2 - FIELD.goalHeight / 2;
                 const goalBottom = FIELD.height / 2 + FIELD.goalHeight / 2;
 
-                // Left Goal (Away Scores)
                 if (this.ball.x < FIELD.margin - 10 && this.ball.y > goalTop && this.ball.y < goalBottom) {
                     this.scoreAway++;
                     this.triggerGoal(this.awayTeamData.name);
-                }
-                // Right Goal (Home Scores)
-                else if (this.ball.x > FIELD.width - FIELD.margin + 10 && this.ball.y > goalTop && this.ball.y < goalBottom) {
+                    recordGoalScorer(this.awayTeamData);
+                } else if (this.ball.x > FIELD.width - FIELD.margin + 10 && this.ball.y > goalTop && this.ball.y < goalBottom) {
                     this.scoreHome++;
                     this.triggerGoal(this.homeTeamData.name);
+                    recordGoalScorer(this.homeTeamData);
                 }
             }
 
@@ -1054,11 +1468,8 @@
                 this.goalTimer = 2.0;
                 audio.playWhistle();
                 audio.playGoalCheer();
-
-                const banner = document.getElementById('goal-banner');
-                const text = document.getElementById('goal-scorer-text');
-                text.innerText = `${teamName.toUpperCase()} ATTI!`;
-                banner.classList.remove('opacity-0');
+                particles.addConfetti();
+                showCommentary(`GOOOOL! ${teamName.toUpperCase()}`);
             }
 
             updateHUD() {
@@ -1069,8 +1480,8 @@
             }
 
             draw(ctx) {
-                // Pitch
-                ctx.fillStyle = '#1e293b';
+                // Pitch Background
+                ctx.fillStyle = '#0f172a';
                 ctx.fillRect(0, 0, FIELD.width, FIELD.height);
 
                 const pitchWidth = FIELD.width - FIELD.margin * 2;
@@ -1082,23 +1493,22 @@
                     ctx.fillRect(FIELD.margin + i * stripeWidth, FIELD.margin, stripeWidth, pitchHeight);
                 }
 
-                // Lines
+                // Field Lines
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 4;
                 ctx.strokeRect(FIELD.margin, FIELD.margin, pitchWidth, pitchHeight);
 
-                // Halfway Line
+                // Halfway Line & Circle
                 ctx.beginPath();
                 ctx.moveTo(FIELD.width / 2, FIELD.margin);
                 ctx.lineTo(FIELD.width / 2, FIELD.height - FIELD.margin);
                 ctx.stroke();
 
-                // Center Circle
                 ctx.beginPath();
                 ctx.arc(FIELD.width / 2, FIELD.height / 2, 75, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Penalty Boxes
+                // Penalty Areas
                 const penHeight = 280;
                 const penWidth = 130;
                 const penTop = FIELD.height / 2 - penHeight / 2;
@@ -1106,7 +1516,7 @@
                 ctx.strokeRect(FIELD.margin, penTop, penWidth, penHeight);
                 ctx.strokeRect(FIELD.width - FIELD.margin - penWidth, penTop, penWidth, penHeight);
 
-                // Goals Nets
+                // Goal Nets
                 const goalTop = FIELD.height / 2 - FIELD.goalHeight / 2;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.fillRect(FIELD.margin - FIELD.goalDepth, goalTop, FIELD.goalDepth, FIELD.goalHeight);
@@ -1115,18 +1525,45 @@
                 ctx.fillRect(FIELD.width - FIELD.margin, goalTop, FIELD.goalDepth, FIELD.goalHeight);
                 ctx.strokeRect(FIELD.width - FIELD.margin, goalTop, FIELD.goalDepth, FIELD.goalHeight);
 
-                // Draw Entities
+                // Draw Entities & Particles
                 this.homePlayers.forEach(p => p.draw(ctx, p === this.controlledPlayer));
                 this.awayPlayers.forEach(p => p.draw(ctx, p === this.controlledPlayer));
                 this.ball.draw(ctx);
+                particles.draw(ctx);
+
+                // Power Shoot Charge Bar Render
+                if (this.shootCharge > 0) {
+                    const p = this.controlledPlayer;
+                    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                    ctx.fillRect(p.x - 20, p.y - 28, 40, 6);
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillRect(p.x - 20, p.y - 28, (this.shootCharge / 100) * 40, 6);
+                }
             }
+        }
+
+        let commentaryTimeout = null;
+        function showCommentary(text) {
+            const banner = document.getElementById('commentary-banner');
+            const elem = document.getElementById('commentary-text');
+            elem.innerText = text;
+            banner.classList.remove('opacity-0');
+
+            if (commentaryTimeout) clearTimeout(commentaryTimeout);
+            commentaryTimeout = setTimeout(() => {
+                banner.classList.add('opacity-0');
+            }, 1800);
+        }
+
+        function recordGoalScorer(team) {
+            const scorerName = `${team.name} Oyuncusu (${team.tag})`;
+            league.topScorers[scorerName] = (league.topScorers[scorerName] || 0) + 1;
         }
 
         let currentActiveMatch = null;
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Screen Navigation Functions
         function showScreen(screenId) {
             ['screen-menu', 'screen-create', 'screen-dashboard', 'screen-game', 'screen-postmatch', 'screen-gameover'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
@@ -1134,7 +1571,6 @@
             document.getElementById(screenId).classList.remove('hidden');
         }
 
-        // Live Kit Preview Handler
         function updateJerseyPreview() {
             const primary = document.getElementById('input-color-primary').value;
             const secondary = document.getElementById('input-color-secondary').value;
@@ -1150,6 +1586,49 @@
         document.getElementById('input-color-secondary').addEventListener('input', updateJerseyPreview);
         document.getElementById('input-team-tag').addEventListener('input', updateJerseyPreview);
 
+        // Dashboard Tab Switchers
+        document.getElementById('tab-standings').addEventListener('click', () => {
+            document.getElementById('view-standings').classList.remove('hidden');
+            document.getElementById('view-scorers').classList.add('hidden');
+            document.getElementById('view-store').classList.add('hidden');
+        });
+
+        document.getElementById('tab-scorers').addEventListener('click', () => {
+            document.getElementById('view-standings').classList.add('hidden');
+            document.getElementById('view-scorers').classList.remove('hidden');
+            document.getElementById('view-store').classList.add('hidden');
+            renderTopScorers();
+        });
+
+        document.getElementById('tab-store').addEventListener('click', () => {
+            document.getElementById('view-standings').classList.add('hidden');
+            document.getElementById('view-scorers').classList.add('hidden');
+            document.getElementById('view-store').classList.remove('hidden');
+            renderStoreUI();
+        });
+
+        // Store Upgrades
+        document.getElementById('btn-buy-speed').addEventListener('click', () => buyUpgrade('speed'));
+        document.getElementById('btn-buy-shoot').addEventListener('click', () => buyUpgrade('shoot'));
+        document.getElementById('btn-buy-defense').addEventListener('click', () => buyUpgrade('defense'));
+        document.getElementById('btn-buy-gk').addEventListener('click', () => buyUpgrade('gk'));
+
+        function buyUpgrade(type) {
+            if (league.userCoins >= 100) {
+                league.userCoins -= 100;
+                league.userUpgrades[type]++;
+                renderStoreUI();
+                document.getElementById('dash-coins').innerText = `${league.userCoins} Altın`;
+            }
+        }
+
+        function renderStoreUI() {
+            document.getElementById('lvl-speed').innerText = `Seviye: ${league.userUpgrades.speed} (+${league.userUpgrades.speed * 5}%)`;
+            document.getElementById('lvl-shoot').innerText = `Seviye: ${league.userUpgrades.shoot} (+${league.userUpgrades.shoot * 5}%)`;
+            document.getElementById('lvl-defense').innerText = `Seviye: ${league.userUpgrades.defense} (+${league.userUpgrades.defense * 5}%)`;
+            document.getElementById('lvl-gk').innerText = `Seviye: ${league.userUpgrades.gk} (+${league.userUpgrades.gk * 5}%)`;
+        }
+
         // Navigation Listeners
         document.getElementById('btn-new-career').addEventListener('click', () => {
             audio.init();
@@ -1162,6 +1641,9 @@
         });
 
         document.getElementById('btn-close-how-to').addEventListener('click', () => {
+            document.getElementById('modal-how-to').classList.add('hidden');
+        });
+        document.getElementById('btn-close-how-to-x').addEventListener('click', () => {
             document.getElementById('modal-how-to').classList.add('hidden');
         });
 
@@ -1187,7 +1669,6 @@
                 P: 0, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0, AV: 0
             };
 
-            // Initialize All 10 Teams
             league.teams = [userTeam];
             PRESET_BOT_TEAMS.forEach(bot => {
                 league.teams.push({
@@ -1199,6 +1680,9 @@
 
             league.fixtures = generateRoundRobinFixtures(league.teams);
             league.currentWeek = 1;
+            league.userCoins = 0;
+            league.userUpgrades = { speed: 0, shoot: 0, defense: 0, gk: 0 };
+            league.topScorers = {};
 
             renderDashboard();
             showScreen('screen-dashboard');
@@ -1210,15 +1694,15 @@
             const userTeam = league.teams.find(t => t.isUser);
             document.getElementById('dash-user-name').innerText = userTeam.name;
             document.getElementById('dash-user-color').style.backgroundColor = userTeam.colorPrimary;
+            document.getElementById('dash-coins').innerText = `${league.userCoins} Altın`;
 
-            // Sort Standings: Points -> Average -> Goals For
+            // Sort Standings
             const sortedTeams = [...league.teams].sort((a, b) => {
                 if (b.P !== a.P) return b.P - a.P;
                 if (b.AV !== a.AV) return b.AV - a.AV;
                 return b.AG - a.AG;
             });
 
-            // Render Standings Table Rows
             const tbody = document.getElementById('table-standings-body');
             tbody.innerHTML = '';
 
@@ -1245,7 +1729,7 @@
                 tbody.appendChild(tr);
             });
 
-            // Render Current Week Fixtures List
+            // Fixtures List
             const weekIndex = league.currentWeek - 1;
             const currentWeekMatches = league.fixtures[weekIndex];
             const fixturesList = document.getElementById('list-weekly-fixtures');
@@ -1279,7 +1763,6 @@
                 fixturesList.appendChild(item);
             });
 
-            // Update Next Opponent Card Box
             const opponentBox = document.getElementById('next-opponent-box');
             if (userMatch) {
                 const opponent = userMatch.home.isUser ? userMatch.away : userMatch.home;
@@ -1290,7 +1773,30 @@
             }
         }
 
-        // Play Match Handler
+        function renderTopScorers() {
+            const tbody = document.getElementById('table-scorers-body');
+            tbody.innerHTML = '';
+
+            const sorted = Object.entries(league.topScorers).sort((a, b) => b[1] - a[1]);
+
+            if (sorted.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">Henüz gol atılmadı.</td></tr>`;
+                return;
+            }
+
+            sorted.slice(0, 10).forEach(([player, goals], idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-800/60 text-slate-300';
+                tr.innerHTML = `
+                    <td class="py-2 pl-2">${idx + 1}</td>
+                    <td class="py-2 font-bold">${player}</td>
+                    <td class="py-2 text-slate-400">QULIGA</td>
+                    <td class="py-2 text-right pr-4 font-black text-amber-400">${goals}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         document.getElementById('btn-play-match').addEventListener('click', () => {
             const weekIndex = league.currentWeek - 1;
             const currentWeekMatches = league.fixtures[weekIndex];
@@ -1303,7 +1809,6 @@
             const homeTeam = league.teams.find(t => t.id === userMatch.homeId);
             const awayTeam = league.teams.find(t => t.id === userMatch.awayId);
 
-            // Setup HUD Colors & Tags
             document.getElementById('hud-home-tag').innerText = homeTeam.tag;
             document.getElementById('hud-home-color').style.backgroundColor = homeTeam.colorPrimary;
             document.getElementById('hud-away-tag').innerText = awayTeam.tag;
@@ -1314,11 +1819,38 @@
             audio.playWhistle();
         });
 
-        function finishUserMatch(userHomeScore, userAwayScore) {
+        // Pause Menu Handlers
+        document.getElementById('btn-pause-game').addEventListener('click', () => {
+            if (currentActiveMatch) {
+                // Populate Pause Stats
+                const totalFrames = (currentActiveMatch.stats.homePossessionFrames + currentActiveMatch.stats.awayPossessionFrames) || 1;
+                const homePoss = Math.round((currentActiveMatch.stats.homePossessionFrames / totalFrames) * 100);
+                
+                document.getElementById('stat-home-shots').innerText = currentActiveMatch.stats.homeShots;
+                document.getElementById('stat-away-shots').innerText = currentActiveMatch.stats.awayShots;
+                document.getElementById('stat-home-ontarget').innerText = currentActiveMatch.stats.homeOnTarget;
+                document.getElementById('stat-away-ontarget').innerText = currentActiveMatch.stats.awayOnTarget;
+                document.getElementById('stat-home-possession').innerText = `${homePoss}%`;
+                document.getElementById('stat-away-possession').innerText = `${100 - homePoss}%`;
+                document.getElementById('stat-home-tackles').innerText = currentActiveMatch.stats.homeTackles;
+                document.getElementById('stat-away-tackles').innerText = currentActiveMatch.stats.awayTackles;
+
+                document.getElementById('modal-pause').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('btn-resume-game').addEventListener('click', () => {
+            document.getElementById('modal-pause').classList.add('hidden');
+        });
+
+        document.getElementById('btn-tactic-balanced').addEventListener('click', () => currentActiveMatch.setTactic('BALANCED'));
+        document.getElementById('btn-tactic-attack').addEventListener('click', () => currentActiveMatch.setTactic('ATTACK'));
+        document.getElementById('btn-tactic-defend').addEventListener('click', () => currentActiveMatch.setTactic('DEFEND'));
+
+        function finishUserMatch(userHomeScore, userAwayScore, stats) {
             const weekIndex = league.currentWeek - 1;
             const currentWeekMatches = league.fixtures[weekIndex];
 
-            // 1. Record User Match Score
             const userMatch = currentWeekMatches.find(m => {
                 const home = league.teams.find(t => t.id === m.homeId);
                 const away = league.teams.find(t => t.id === m.awayId);
@@ -1330,46 +1862,48 @@
 
             updateTeamStats(userMatch.homeId, userMatch.awayId, userHomeScore, userAwayScore);
 
-            // 2. Simulate Remaining 4 Bot Matches for Current Week
+            // Earn Coins Calculation
+            const home = league.teams.find(t => t.id === userMatch.homeId);
+            const userScore = home.isUser ? userHomeScore : userAwayScore;
+            const botScore = home.isUser ? userAwayScore : userHomeScore;
+
+            let earnedCoins = 30 + (userScore * 15);
+            if (userScore > botScore) earnedCoins += 120;
+            else if (userScore === botScore) earnedCoins += 50;
+
+            league.userCoins += earnedCoins;
+            document.getElementById('post-earned-coins').innerText = `+${earnedCoins} 🪙`;
+
+            // Simulate remaining week matches
             const simList = document.getElementById('simulated-results-list');
             simList.innerHTML = '';
 
             currentWeekMatches.forEach(m => {
                 if (m !== userMatch) {
-                    const home = league.teams.find(t => t.id === m.homeId);
-                    const away = league.teams.find(t => t.id === m.awayId);
+                    const homeTeam = league.teams.find(t => t.id === m.homeId);
+                    const awayTeam = league.teams.find(t => t.id === m.awayId);
 
-                    // Weighted random score based on team rating
-                    const homeRating = home.rating || 1.0;
-                    const awayRating = away.rating || 1.0;
-
-                    let hG = Math.max(0, Math.floor((Math.random() * 2.5) * homeRating));
-                    let aG = Math.max(0, Math.floor((Math.random() * 2.5) * awayRating));
+                    let hG = Math.max(0, Math.floor((Math.random() * 2.5) * (homeTeam.rating || 1)));
+                    let aG = Math.max(0, Math.floor((Math.random() * 2.5) * (awayTeam.rating || 1)));
 
                     m.homeScore = hG;
                     m.awayScore = aG;
 
-                    updateTeamStats(home.id, away.id, hG, aG);
+                    updateTeamStats(homeTeam.id, awayTeam.id, hG, aG);
 
                     const simItem = document.createElement('div');
                     simItem.className = 'flex justify-between items-center border-b border-slate-800/40 pb-1';
                     simItem.innerHTML = `
-                        <span>${home.name}</span>
+                        <span>${homeTeam.name}</span>
                         <span class="font-bold text-amber-400">${hG} - ${aG}</span>
-                        <span>${away.name}</span>
+                        <span>${awayTeam.name}</span>
                     `;
                     simList.appendChild(simItem);
                 }
             });
 
-            // Show Post Match Overlay
-            const home = league.teams.find(t => t.id === userMatch.homeId);
-            const away = league.teams.find(t => t.id === userMatch.awayId);
             document.getElementById('post-match-score').innerText = `${userHomeScore} - ${userAwayScore}`;
-
             const headline = document.getElementById('post-match-headline');
-            const userScore = home.isUser ? userHomeScore : userAwayScore;
-            const botScore = home.isUser ? userAwayScore : userHomeScore;
 
             if (userScore > botScore) {
                 headline.innerText = 'Harika Galibiyet! 3 Puan Hanende.';
@@ -1389,41 +1923,28 @@
             const home = league.teams.find(t => t.id === homeId);
             const away = league.teams.find(t => t.id === awayId);
 
-            home.O += 1;
-            away.O += 1;
-
-            home.AG += hG;
-            home.YG += aG;
-            away.AG += aG;
-            away.YG += hG;
-
+            home.O += 1; away.O += 1;
+            home.AG += hG; home.YG += aG;
+            away.AG += aG; away.YG += hG;
             home.AV = home.AG - home.YG;
             away.AV = away.AG - away.YG;
 
             if (hG > aG) {
-                home.G += 1;
-                home.P += 3;
-                away.M += 1;
+                home.G += 1; home.P += 3; away.M += 1;
             } else if (hG < aG) {
-                away.G += 1;
-                away.P += 3;
-                home.M += 1;
+                away.G += 1; away.P += 3; home.M += 1;
             } else {
-                home.B += 1;
-                home.P += 1;
-                away.B += 1;
-                away.P += 1;
+                home.B += 1; home.P += 1;
+                away.B += 1; away.P += 1;
             }
         }
 
-        // Continue to Dashboard or Finish Season
         document.getElementById('btn-continue-dashboard').addEventListener('click', () => {
             if (league.currentWeek < 9) {
                 league.currentWeek++;
                 renderDashboard();
                 showScreen('screen-dashboard');
             } else {
-                // Season End Champion Display
                 const sorted = [...league.teams].sort((a, b) => b.P - a.P || b.AV - a.AV);
                 const champion = sorted[0];
 
@@ -1453,6 +1974,10 @@
             if (e.code === 'KeyZ' || e.code === 'Space') { keys.Pass = true; e.preventDefault(); }
             if (e.code === 'KeyX' || e.code === 'ShiftLeft') { keys.Shoot = true; e.preventDefault(); }
             if (e.code === 'KeyC') { keys.Switch = true; }
+            if (e.code === 'KeyV' || e.code === 'KeyE') { keys.Sprint = true; }
+            if (e.code === 'Escape') {
+                document.getElementById('btn-pause-game').click();
+            }
         });
 
         window.addEventListener('keyup', (e) => {
@@ -1463,6 +1988,7 @@
             if (e.code === 'KeyZ' || e.code === 'Space') keys.Pass = false;
             if (e.code === 'KeyX' || e.code === 'ShiftLeft') keys.Shoot = false;
             if (e.code === 'KeyC') keys.Switch = false;
+            if (e.code === 'KeyV' || e.code === 'KeyE') keys.Sprint = false;
         });
 
         function setupTouchControls() {
@@ -1508,17 +2034,18 @@
             dpadZone.addEventListener('touchend', resetStick);
             dpadZone.addEventListener('touchcancel', resetStick);
 
-            document.getElementById('btn-touch-shoot').addEventListener('touchstart', (e) => {
-                keys.Shoot = true;
-                e.preventDefault();
-            });
+            document.getElementById('btn-touch-shoot').addEventListener('touchstart', (e) => { keys.Shoot = true; e.preventDefault(); });
             document.getElementById('btn-touch-shoot').addEventListener('touchend', () => keys.Shoot = false);
 
-            document.getElementById('btn-touch-pass').addEventListener('touchstart', (e) => {
-                keys.Pass = true;
-                e.preventDefault();
-            });
+            document.getElementById('btn-touch-pass').addEventListener('touchstart', (e) => { keys.Pass = true; e.preventDefault(); });
             document.getElementById('btn-touch-pass').addEventListener('touchend', () => keys.Pass = false);
+
+            document.getElementById('btn-touch-sprint').addEventListener('touchstart', (e) => { keys.Sprint = true; e.preventDefault(); });
+            document.getElementById('btn-touch-sprint').addEventListener('touchend', () => keys.Sprint = false);
+
+            document.getElementById('btn-touch-tactic').addEventListener('click', () => {
+                document.getElementById('btn-pause-game').click();
+            });
         }
 
         let lastTimestamp = 0;
@@ -1528,7 +2055,7 @@
             const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
             lastTimestamp = timestamp;
 
-            if (currentActiveMatch && !document.getElementById('screen-game').classList.contains('hidden')) {
+            if (currentActiveMatch && !document.getElementById('screen-game').classList.contains('hidden') && document.getElementById('modal-pause').classList.contains('hidden')) {
                 currentActiveMatch.update(dt);
                 currentActiveMatch.draw(ctx);
             }
